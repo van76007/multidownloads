@@ -15,8 +15,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import dev.multidownloads.builder.TaskBuilder;
+import dev.multidownloads.builder.CatalogBuilder;
 import dev.multidownloads.config.Config;
+import dev.multidownloads.model.DownloadCatalog;
 import dev.multidownloads.model.DownloadStatus;
 import dev.multidownloads.model.DownloadTask;
 import dev.multidownloads.progress.UpdateBatchDownloadProgress;
@@ -37,15 +38,20 @@ public class DownloadManager
 			DownloadLogger.setup();
 		} catch(IOException e) {}
 		
-		String downloadList = null;
+		String catalogFileName = null;
 		if (args.length > 0)
-			downloadList = args[0];
+			catalogFileName = args[0];
 		
 		String now = new SimpleDateFormat("yyy/MM/dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
 		logger.log(Level.FINE, "Start downloading at " + now);
 		
-		List<DownloadTask> tasks = TaskBuilder.buildTasks(downloadList);
-		downloadWithRetry(tasks);
+		DownloadCatalog catalog = new DownloadCatalog(catalogFileName);
+		CatalogBuilder.buildCatalog(catalog);
+		if (catalog.isValid()) {
+			downloadWithRetry(catalog.getTasks());
+		} else {
+			logger.log(Level.SEVERE, "Impossible to download");
+		}
 		
 		now = new SimpleDateFormat("yyy/MM/dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
 		logger.log(Level.FINE, "End downloading at " + now);
