@@ -107,6 +107,11 @@ public class CatalogBuilder {
 		//return Arrays.asList("http://www.freeclassicebooks.com/Louisa%20May%20Alcott/A%20Garland%20For%20Girls.pdf");
 		
 		/*
+		return Arrays.asList("http://www.freeclassicebooks.com/Louisa%20May%20Alcott/A%20Garland%20For%20Girls.pdf",
+				"http://www.freeclassicebooks.com/Louisa%20May%20Alcott/Short%20Stories/A%20Country%20Christmas.pdf");
+		*/
+		
+		/*
 		return Arrays.asList("ftp://mirrors.dotsrc.org/debian-cd/8.7.1/amd64/iso-cd/debian-8.7.1-amd64-CD-1.iso",
 				"http://dl.my-film.org/reza/film/Acid%20480p%20DVDRip-[My-Film].mkv");
 				*/
@@ -129,17 +134,19 @@ public class CatalogBuilder {
 		/*
 		return Arrays.asList("http://www.freeclassicebooks.com/Louisa%20May%20Alcott/A%20Garland%20For%20Girls.pdf",
 				"http://dl.my-film.org/reza/film/Coral.Reef.Adventure.2003.IMAX.720p-[My-Film].mkv");
-				*/
+		*/
 		
+		/*
 		return Arrays.asList("http://www.freeclassicebooks.com/Louisa%20May%20Alcott/A%20Garland%20For%20Girls.pdf",
 				"http://dl.my-film.org/reza/film/Coral.Reef.Adventure.2003.IMAX.720p-[My-Film].mkv",
 				"http://www.freeclassicebooks.com/Louisa%20May%20Alcott/Short%20Stories/A%20Country%20Christmas.pdf",
 				"ftp://mirrors.dotsrc.org/debian-cd/8.7.1/amd64/iso-cd/debian-8.7.1-amd64-CD-1.iso");
-		
-		/*
-		return Arrays.asList("http://www.freeclassicebooks.com/Louisa%20May%20Alcott/A%20Garland%20For%20Girls.pdf",
-				"http://www.freeclassicebooks.com/Louisa%20May%20Alcott/Short%20Stories/A%20Country%20Christmas.pdf");
 		*/
+		
+		return Arrays.asList("http://www.freeclassicebooks.com/Louisa%20May%20Alcott/A%20Garland%20For%20Girls.pdf",
+				"http://www.freeclassicebooks.com/Louisa%20May%20Alcott/Short%20Stories/A%20Country%20Christmas.pdf",
+				"ftp://mirrors.dotsrc.org/debian-cd/8.7.1/amd64/jigdo-bd/debian-8.7.1-amd64-BD-1.template",
+				"ftp://mirrors.dotsrc.org/debian-cd/8.7.1/amd64/jigdo-bd/debian-8.7.1-amd64-BD-1.jigdo");
 		
 		//return DownloadListReader.readDownloadList(downloadListFile);
 	}
@@ -151,9 +158,9 @@ public class CatalogBuilder {
 		while(start <= fileSize - 1) {
 			Segmentation seg = new Segmentation();
 			
-			seg.setStartByte(start);
+			seg.startByte = start;
 			start += segmentationSize;
-			seg.setEndByte(start < fileSize ? start - 1 : fileSize - 1);
+			seg.endByte = (start < fileSize ? start - 1 : fileSize - 1);
 			
 			segs.add(seg);
 		}

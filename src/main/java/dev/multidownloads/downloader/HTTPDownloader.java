@@ -16,7 +16,7 @@ import dev.multidownloads.progress.DownloadListener;
 
 public class HTTPDownloader extends Downloader implements Callable<Segmentation> {
 	private static final Logger logger = Logger.getLogger("dev.multidownloads");
-	private static final int TIMEOUT = 10000;
+	private static final int TIMEOUT = 30000;
 	
 	public HTTPDownloader(DownloadInfor infor, Segmentation seg, DownloadListener progressListener) {
 		super(infor, seg, progressListener);
@@ -27,8 +27,9 @@ public class HTTPDownloader extends Downloader implements Callable<Segmentation>
 		BufferedInputStream in = null;
 		RandomAccessFile raf = null;
 		
+		HttpURLConnection conn = null;
 		try {
-			HttpURLConnection conn = (HttpURLConnection) new URL(infor.getUrl()).openConnection();
+			conn = (HttpURLConnection) new URL(infor.getUrl()).openConnection();
 			int timeout = TIMEOUT;
 			try {
 				timeout = Integer.valueOf(Config.getProperty("TIMEOUT"));
@@ -40,7 +41,7 @@ public class HTTPDownloader extends Downloader implements Callable<Segmentation>
 			
 			if (infor.isSupportMultiPartsDownload()) {
 				// set the range of bytes to download
-				StringBuilder sb = new StringBuilder("bytes=").append(seg.getStartByte()).append("-").append(seg.getEndByte());
+				StringBuilder sb = new StringBuilder("bytes=").append(seg.startByte).append("-").append(seg.endByte);
 				conn.setRequestProperty("Range", sb.toString());
 			}
 			
@@ -51,6 +52,7 @@ public class HTTPDownloader extends Downloader implements Callable<Segmentation>
 				setError(this.seg);
 			}
 			
+			seg.setStatus(DownloadStatus.DOWNLOADING);
 			// get the input stream
 			in = new BufferedInputStream(conn.getInputStream());
 			
@@ -59,7 +61,7 @@ public class HTTPDownloader extends Downloader implements Callable<Segmentation>
 			raf = new RandomAccessFile(sb.toString(), "rw");
 			
 			if (infor.isSupportMultiPartsDownload()) {
-				raf.seek(seg.getStartByte());
+				raf.seek(seg.startByte);
 			} else {
 				// If single download, always download from the beginning of file
 				raf.seek(0);
@@ -70,7 +72,7 @@ public class HTTPDownloader extends Downloader implements Callable<Segmentation>
 			this.seg.setStatus(DownloadStatus.DONE);
 		} catch (Exception e) {
 			setError(this.seg);
-			StringBuilder sb = new StringBuilder("Error in downloading 1 segment of file via HTTP. Range: ").append(seg.getStartByte()).append("-").append(seg.getEndByte());
+			StringBuilder sb = new StringBuilder("Error in downloading 1 segment of file via HTTP. Range: ").append(seg.startByte).append("-").append(seg.endByte);
 			logger.log(Level.SEVERE, sb.toString(), e);
 		} finally {
 			if (raf != null) {
@@ -84,8 +86,12 @@ public class HTTPDownloader extends Downloader implements Callable<Segmentation>
 					in.close();
 				} catch (IOException e) {}
 			}
+			
+			conn.disconnect();
 		}
 		
+		StringBuilder sb = new StringBuilder("Stop downloading seg: ").append(seg.toString());
+		logger.log(Level.FINE, sb.toString());
 		return this.seg;
 	}
 

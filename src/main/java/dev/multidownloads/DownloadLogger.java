@@ -20,7 +20,7 @@ public class DownloadLogger {
 	private static void addLoggingHandlers(Logger logger) throws IOException {
 		logger.addHandler(new ConsoleHandler());
 		String date = new SimpleDateFormat("yyy-MM-dd_HH_mm").format(new Date(System.currentTimeMillis()));
-		Handler handler = new FileHandler("./download_" + date + "_%u.log", 1024*1024, 5, true);
+		Handler handler = new FileHandler("./download_" + date + "_%u.log", 1024*1024, 50, true);
 		logger.addHandler(handler);
 		handler.setFormatter(new SimpleFormatter());
 	}

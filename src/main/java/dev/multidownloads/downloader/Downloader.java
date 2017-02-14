@@ -22,7 +22,7 @@ public class Downloader {
 		this.infor = infor;
 		this.seg = seg;
 		this.progressListener = progressListener;
-		StringBuilder sb = new StringBuilder("To download a file from URL ").append(infor.getUrl());
+		StringBuilder sb = new StringBuilder("To download a file ").append(infor.getFileName()).append(" in ").append(seg.toString());
 		logger.log(Level.FINE, sb.toString());
 	}
 	
@@ -34,17 +34,43 @@ public class Downloader {
 			logger.log(Level.WARNING, "No config of BUFFER_SIZE");
 		}
 		
+		// HTTP read
+		/*
 		byte data[] = new byte[bufSize];
 		int numByteRead;
-		while((numByteRead = input.read(data,0,bufSize)) != -1 && seg.getStartByte() < seg.getEndByte())
+		while((numByteRead = input.read(data,0,bufSize)) != -1 && seg.startByte < seg.endByte)
 		{
 			// write to buffer
 			raf.write(data,0,numByteRead);
 			// increase the startByte for retry later
-			seg.setStartByte(seg.getStartByte() + numByteRead);
+			seg.startByte += numByteRead;
 			// update progress
 			progressListener.onUpdate(numByteRead, infor.getFileName());
 		}
+		*/
+		
+		// FTP read
+		byte data[] = new byte[bufSize];
+		int numByteRead;
+		int remaining = seg.endByte - seg.startByte + 1;
+		
+		int readBufSize = bufSize < remaining ? bufSize : remaining;
+		
+		while((numByteRead = input.read(data,0,readBufSize)) != -1 && remaining > 0)
+		{
+			// write to buffer
+			raf.write(data,0,numByteRead);			
+			// increase the startByte for retry later
+			seg.startByte += numByteRead;
+			
+			remaining -= numByteRead;
+			readBufSize = bufSize < remaining ? bufSize : remaining;
+			
+			// update progress
+			progressListener.onUpdate(numByteRead, infor.getFileName());
+		}
+		
+		
 	}
 	
 	protected void setError(Segmentation seg){}

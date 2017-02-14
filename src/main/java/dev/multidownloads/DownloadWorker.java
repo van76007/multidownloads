@@ -78,6 +78,8 @@ public class DownloadWorker implements Callable<DownloadTask> {
 			logger.log(Level.SEVERE, "Error in terminating download of 1 file", e);
 		}
 		
+		StringBuilder sb = new StringBuilder("Stop retrieving resource: ").append(task.getInfor().getFileName());
+		logger.log(Level.FINE, sb.toString());
 		return this.task;
 	}
 }

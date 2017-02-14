@@ -88,7 +88,7 @@ public class DownloadManager
 	}
 	
 	private static int downloadOnePass(List<DownloadTask> tasks, int numberOfCompleteFiles) {
-		
+		logger.log(Level.FINE, "Start one pass");
 		int numberOfParallelDownload = NUM_OF_PARALLEL_DOWNLOAD;
 		try {
 			numberOfParallelDownload = Integer.valueOf(Config.getProperty("NUM_OF_PARALLEL_DOWNLOAD"));
@@ -103,7 +103,8 @@ public class DownloadManager
 		progress.setNumberOfCompletedFiles(numberOfCompleteFiles);
 		
 		for (DownloadTask task : tasks) {
-			logger.log(Level.FINE, "Submit a download task to queue. Infor: " + task.getInfor().toString());
+			StringBuilder sb = new StringBuilder("Submit a download task to queue. Infor: ").append(task.getInfor().toString());
+			logger.log(Level.FINE, sb.toString());
 			Callable<DownloadTask> downloadWorker = new DownloadWorker(task, progress);
 			listOfDownloadTasks.add(executor.submit(downloadWorker));
 		}
@@ -125,6 +126,7 @@ public class DownloadManager
 			logger.log(Level.SEVERE, "Error in terminating download", e);
 		}
 		
+		logger.log(Level.FINE, "End one pass");
 		return progress.getNumberOfCompletedFiles();
 	}
 	

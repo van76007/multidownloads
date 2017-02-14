@@ -16,7 +16,7 @@ import dev.multidownloads.progress.DownloadListener;
 
 public class FTPDownloader extends Downloader implements Callable<Segmentation> {
 	private static final Logger logger = Logger.getLogger("dev.multidownloads");
-	private static final int TIMEOUT = 10000;
+	private static final int TIMEOUT = 30000;
 	
 	public FTPDownloader(DownloadInfor infor, Segmentation seg, DownloadListener progressListener) {
 		super(infor, seg, progressListener);
@@ -35,23 +35,25 @@ public class FTPDownloader extends Downloader implements Callable<Segmentation> 
 			} catch (NumberFormatException e) {
 				logger.log(Level.WARNING, "No config of FTP connection TIMEOUT");
 			}
+			conn.setReadTimeout(timeout);
 			conn.setConnectTimeout(timeout);
 			
+			seg.setStatus(DownloadStatus.DOWNLOADING);
 			// get the input stream and seek to the range of byte to download
 			in = new BufferedInputStream(conn.getInputStream());
-			in.skip(seg.getStartByte());
+			in.skip(seg.startByte);
 			
 			// open the output file and seek to the start location
 			StringBuilder sb = new StringBuilder(infor.getDownloadDirectory()).append(infor.getFileName());
 			raf = new RandomAccessFile(sb.toString(), "rw");
-			raf.seek(seg.getStartByte());
+			raf.seek(seg.startByte);
 			
 			// start transferring byte
 			transfer(in, raf, this.seg);
 			this.seg.setStatus(DownloadStatus.DONE);
 		} catch (Exception e) {
 			setError(this.seg);
-			StringBuilder sb = new StringBuilder("Error in downloading 1 segment of file via FTP. Range: ").append(seg.getStartByte()).append("-").append(seg.getEndByte());
+			StringBuilder sb = new StringBuilder("Error in downloading 1 segment of file via FTP. Range: ").append(seg.startByte).append("-").append(seg.endByte);
 			logger.log(Level.SEVERE, sb.toString(), e);
 		} finally {
 			if (raf != null) {
@@ -67,6 +69,8 @@ public class FTPDownloader extends Downloader implements Callable<Segmentation> 
 			}
 		}
 		
+		StringBuilder sb = new StringBuilder("Stop downloading seg: ").append(seg.toString());
+		logger.log(Level.FINE, sb.toString());
 		return this.seg;
 	}
 
