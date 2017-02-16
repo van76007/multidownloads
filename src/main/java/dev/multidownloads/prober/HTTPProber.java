@@ -8,17 +8,19 @@ import java.util.logging.Logger;
 import dev.multidownloads.config.Config;
 import dev.multidownloads.model.DownloadInfor;
 
-public class HTTPProber implements Prober {
+public class HTTPProber extends DownloadProber {
 	private static final Logger logger = Logger.getLogger("dev.multidownloads");
 	private static final int TIMEOUT = 10000;
-
+	
+	/*
 	@Override
 	public void probeResource(DownloadInfor infor) {
 		inquiryIfSupportRangeHeader(infor);
 		inquiryFileLength(infor);
 	}
-
-	private void inquiryIfSupportRangeHeader(DownloadInfor infor) {
+	*/
+	
+	protected void inquiryIfSupportMultiPartsDownload(DownloadInfor infor) {
 		try {
 			HttpURLConnection conn = (HttpURLConnection) new URL(infor.getUrl()).openConnection();
 			int timeout = TIMEOUT;
@@ -45,7 +47,7 @@ public class HTTPProber implements Prober {
 		}
 	}
 	
-	private void inquiryFileLength(DownloadInfor infor) {
+	protected void inquiryFileLength(DownloadInfor infor) {
 		try {
 			HttpURLConnection conn = (HttpURLConnection) new URL(infor.getUrl()).openConnection();
 			int timeout = TIMEOUT;

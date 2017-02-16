@@ -2,6 +2,7 @@ package dev.multidownloads.downloader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
+import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,43 +35,24 @@ public class Downloader {
 			logger.log(Level.WARNING, "No config of BUFFER_SIZE");
 		}
 		
-		// HTTP read
-		/*
-		byte data[] = new byte[bufSize];
 		int numByteRead;
-		while((numByteRead = input.read(data,0,bufSize)) != -1 && seg.startByte < seg.endByte)
-		{
-			// write to buffer
-			raf.write(data,0,numByteRead);
-			// increase the startByte for retry later
-			seg.startByte += numByteRead;
-			// update progress
-			progressListener.onUpdate(numByteRead, infor.getFileName());
-		}
-		*/
+		byte data[] = new byte[bufSize];
 		
-		// FTP read
-		byte data[] = new byte[bufSize];
-		int numByteRead;
 		int remaining = seg.endByte - seg.startByte + 1;
-		
-		int readBufSize = bufSize < remaining ? bufSize : remaining;
-		
-		while((numByteRead = input.read(data,0,readBufSize)) != -1 && remaining > 0)
-		{
-			// write to buffer
-			raf.write(data,0,numByteRead);			
-			// increase the startByte for retry later
-			seg.startByte += numByteRead;
+		while(remaining > 0) {
+			int readBufSize = bufSize < remaining ? bufSize : remaining;
+			numByteRead = input.read(data,0,readBufSize);
 			
-			remaining -= numByteRead;
-			readBufSize = bufSize < remaining ? bufSize : remaining;
-			
-			// update progress
+			raf.write(data,0,numByteRead);
 			progressListener.onUpdate(numByteRead, infor.getFileName());
+			
+			seg.startByte += numByteRead;
+			remaining -= numByteRead;
 		}
 		
-		
+		if(remaining < 0) {
+			logger.log(Level.SEVERE, "Number of Remaining bytes is negative");
+		}
 	}
 	
 	protected void setError(Segmentation seg){}

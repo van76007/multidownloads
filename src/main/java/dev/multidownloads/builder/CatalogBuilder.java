@@ -18,7 +18,8 @@ import dev.multidownloads.model.Segmentation;
 
 public class CatalogBuilder {
 	private static final Logger logger = Logger.getLogger("dev.multidownloads");
-	private static final int SEGMENTATION_SIZE = 4096 * 10;
+	//private static final int SEGMENTATION_SIZE = 262144; // 256kB
+	private static final int SEGMENTATION_SIZE = 1048576;
 	
 	public static void buildCatalog(DownloadCatalog catalog) {
 		int segmentationSize = SEGMENTATION_SIZE;
@@ -61,8 +62,8 @@ public class CatalogBuilder {
 	private static List<DownloadTask> buidTasks(String downloadDiretory, String catalogFileName, int segmentationSize) {
 		List<DownloadTask> tasks = new ArrayList<DownloadTask>();
 		
-		for (String url : parseDownloadList(catalogFileName)) {
-			DownloadInfor infor = InforBuilder.buildInfor(url, downloadDiretory);
+		for (String catalogLine : parseDownloadList(catalogFileName)) {
+			DownloadInfor infor = InforBuilder.buildInfor(catalogLine, downloadDiretory);
 			if (infor.isValid()) {
 				DownloadTask task = new DownloadTask(infor);
 				if (infor.isSupportMultiPartsDownload()) {
@@ -106,6 +107,10 @@ public class CatalogBuilder {
 	private static List<String> parseDownloadList(String downloadListFile) {
 		//return Arrays.asList("http://www.freeclassicebooks.com/Louisa%20May%20Alcott/A%20Garland%20For%20Girls.pdf");
 		
+		//return Arrays.asList("ftp://mirrors.dotsrc.org/debian-cd/8.7.1/amd64/jigdo-bd/debian-8.7.1-amd64-BD-1.template");
+		
+		//return Arrays.asList("ftp://mirrors.dotsrc.org/debian-cd/8.7.1/amd64/jigdo-bd/debian-8.7.1-amd64-BD-1.jigdo");
+		
 		/*
 		return Arrays.asList("http://www.freeclassicebooks.com/Louisa%20May%20Alcott/A%20Garland%20For%20Girls.pdf",
 				"http://www.freeclassicebooks.com/Louisa%20May%20Alcott/Short%20Stories/A%20Country%20Christmas.pdf");
@@ -143,11 +148,31 @@ public class CatalogBuilder {
 				"ftp://mirrors.dotsrc.org/debian-cd/8.7.1/amd64/iso-cd/debian-8.7.1-amd64-CD-1.iso");
 		*/
 		
-		return Arrays.asList("http://www.freeclassicebooks.com/Louisa%20May%20Alcott/A%20Garland%20For%20Girls.pdf",
+		
+		return Arrays.asList(
+				"http://dl.my-film.org/reza/film/Coral.Reef.Adventure.2003.IMAX.720p-[My-Film].mkv",
+				"http://www.freeclassicebooks.com/Louisa%20May%20Alcott/A%20Garland%20For%20Girls.pdf",
 				"http://www.freeclassicebooks.com/Louisa%20May%20Alcott/Short%20Stories/A%20Country%20Christmas.pdf",
-				"ftp://mirrors.dotsrc.org/debian-cd/8.7.1/amd64/jigdo-bd/debian-8.7.1-amd64-BD-1.template",
+				"ftp://mirrors.dotsrc.org/debian-cd/8.7.1/amd64/jigdo-bd/debian-8.7.1-amd64-BD-1.template;A;AA",
 				"ftp://mirrors.dotsrc.org/debian-cd/8.7.1/amd64/jigdo-bd/debian-8.7.1-amd64-BD-1.jigdo");
 		
+		
+		/*
+		return Arrays.asList(
+				"http://www.freeclassicebooks.com/Agatha%20Christie/The%20Secret%20Adversary.pdf",
+				"http://www.freeclassicebooks.com/charlotte%20bronte/Jane%20Eyre.pdf");
+		*/
+		
+		/*
+		return Arrays.asList("ftp://mirrors.dotsrc.org/debian-cd/8.7.1/multi-arch/bt-dvd/debian-8.7.1-i386-amd64-source-DVD-1.iso.torrent",
+				"ftp://mirrors.dotsrc.org/debian-cd/8.7.1/amd64/jigdo-bd/debian-8.7.1-amd64-BD-1.jigdo",
+				"ftp://mirrors.dotsrc.org/debian-cd/8.7.1/amd64/jigdo-bd/debian-8.7.1-amd64-BD-1.template");
+		*/
+		
+		/*
+		return Arrays.asList("ftp://mirrors.dotsrc.org/debian-cd/8.7.1/amd64/jigdo-bd/debian-8.7.1-amd64-BD-1.template",
+				"ftp://mirrors.dotsrc.org/debian-cd/8.7.1/amd64/jigdo-bd/debian-8.7.1-amd64-BD-1.jigdo");
+		*/
 		//return DownloadListReader.readDownloadList(downloadListFile);
 	}
 	

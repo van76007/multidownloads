@@ -21,6 +21,8 @@ import dev.multidownloads.progress.UpdateFileDownloadProgress;
 public class DownloadWorker implements Callable<DownloadTask> {
 	private static final Logger logger = Logger.getLogger("dev.multidownloads");
 	private static final int NUM_OF_CONCURRENT_CONNECTION = 5;
+	private static final int TIMEOUT_IN_SECONDS = 30;
+	
 	DownloadTask task;
 	DownloadListener progressListener;
 
@@ -73,7 +75,7 @@ public class DownloadWorker implements Callable<DownloadTask> {
 		
 		executor.shutdown();
 		try {
-			executor.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
+			executor.awaitTermination(TIMEOUT_IN_SECONDS, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
 			logger.log(Level.SEVERE, "Error in terminating download of 1 file", e);
 		}

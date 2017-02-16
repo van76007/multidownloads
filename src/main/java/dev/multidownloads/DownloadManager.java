@@ -32,6 +32,7 @@ public class DownloadManager
 	private static final int NUM_OF_PARALLEL_DOWNLOAD = 2;
 	private static final int MAX_NUM_OF_RETRY = 3;
 	private static final int DELAY = 1000*180;
+	private static final int TIMEOUT_IN_SECONDS = 30;
 	
 	public static void main(String[] args) {
 		try{
@@ -121,7 +122,7 @@ public class DownloadManager
 		
 		executor.shutdown();
 		try {
-			executor.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
+			executor.awaitTermination(TIMEOUT_IN_SECONDS, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
 			logger.log(Level.SEVERE, "Error in terminating download", e);
 		}
