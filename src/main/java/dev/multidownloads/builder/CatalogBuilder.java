@@ -114,11 +114,9 @@ public class CatalogBuilder {
 		int start = 0;
 		while(start <= fileSize - 1) {
 			Segmentation seg = new Segmentation();
-			
 			seg.startByte = start;
 			start += segmentationSize;
 			seg.endByte = (start < fileSize ? start - 1 : fileSize - 1);
-			
 			segs.add(seg);
 		}
 		

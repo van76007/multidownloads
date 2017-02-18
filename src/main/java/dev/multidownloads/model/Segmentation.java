@@ -5,6 +5,13 @@ public class Segmentation {
 	public int startByte;
 	public int endByte;
 	
+	public Segmentation() {}
+	
+	public Segmentation(int startByte, int endByte) {
+		this.startByte = startByte;
+		this.endByte = endByte;
+	}
+	
 	public DownloadStatus getStatus() {
 		return status;
 	}

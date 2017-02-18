@@ -79,7 +79,7 @@ public class DownloadManager
 		
 		if (!tasks.isEmpty()) {
 			logger.error("Some download tasks can not be completed");
-			clearCorruptedDownloadedFiles(tasks);
+			clearCorruptedFiles(tasks);
 		} else {
 			logger.info("All download tasks finish");
 		}
@@ -127,7 +127,7 @@ public class DownloadManager
 		return progress.getNumberOfCompletedFiles();
 	}
 	
-	private static void clearCorruptedDownloadedFiles(List<DownloadTask> tasks) {
+	private static void clearCorruptedFiles(List<DownloadTask> tasks) {
 		for (DownloadTask task : tasks) {
 			StringBuilder sb = new StringBuilder(task.getInfor().getDownloadDirectory()).append(task.getInfor().getFileName());
 			try {

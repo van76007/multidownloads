@@ -1,6 +1,7 @@
 package dev.multidownloads.downloader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.RandomAccessFile;
 
 import org.apache.logging.log4j.LogManager;
@@ -26,7 +27,7 @@ public class Downloader {
 		logger.info("To download a file {} in {}", infor.getFileName(), seg.toString());
 	}
 	
-	protected void transfer(InputStream input, RandomAccessFile raf, Segmentation seg) throws IOException {
+	public void transfer(InputStream input, RandomAccessFile raf, Segmentation seg) throws IOException {
 		int bufSize = BUFFER_SIZE;
 		try {
 			bufSize = Integer.valueOf(Config.getProperty("BUFFER_SIZE"));

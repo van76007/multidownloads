@@ -11,7 +11,7 @@ import dev.multidownloads.model.DownloadInfor;
 
 public class HTTPProber extends DownloadProber {
 	final static Logger logger = LogManager.getLogger(HTTPProber.class);
-	private static final int TIMEOUT = 10000;
+	private static final int TIMEOUT = 30000;
 	
 	protected void inquiryIfSupportMultiPartsDownload(DownloadInfor infor) {
 		try {

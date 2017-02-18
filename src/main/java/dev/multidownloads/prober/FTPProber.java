@@ -13,7 +13,7 @@ import dev.multidownloads.model.DownloadInfor;
 
 public class FTPProber extends DownloadProber {
 	final static Logger logger = LogManager.getLogger(FTPProber.class);
-	private static final int TIMEOUT = 10000;
+	private static final int TIMEOUT = 30000;
 
 	@Override
 	protected void inquiryFileLength(DownloadInfor infor) {
