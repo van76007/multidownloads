@@ -23,6 +23,6 @@ public class UpdateBatchDownloadProgress implements DownloadListener {
 	@Override
 	public synchronized void onUpdate(int completeFiles, String unused) {
 		numberOfCompletedFiles += completeFiles;
-		logger.debug(String.format("Complete download %d files / total %d files\n", numberOfCompletedFiles, this.totalNumberOfFiles));
+		logger.info(String.format("Complete download %d files / total %d files\n", numberOfCompletedFiles, this.totalNumberOfFiles));
 	}
 }

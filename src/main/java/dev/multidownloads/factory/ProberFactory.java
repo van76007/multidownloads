@@ -1,17 +1,16 @@
 package dev.multidownloads.factory;
 
-import dev.multidownloads.model.DownloadInfor;
 import dev.multidownloads.model.Protocol;
 import dev.multidownloads.prober.FTPProber;
 import dev.multidownloads.prober.HTTPProber;
 import dev.multidownloads.prober.Prober;
 
 public class ProberFactory {
-	public static Prober getProbe(DownloadInfor infor) {
-		if (Protocol.HTTP == infor.getProtocol()) {
+	public static Prober getProbe(Protocol proto) {
+		if (Protocol.HTTP == proto) {
 			return new HTTPProber();
 		}
-		if (Protocol.FTP == infor.getProtocol()) {
+		if (Protocol.FTP == proto) {
 			return new FTPProber();
 		}
 		return null;

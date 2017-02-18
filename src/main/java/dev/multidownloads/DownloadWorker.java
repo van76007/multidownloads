@@ -40,7 +40,7 @@ public class DownloadWorker implements Callable<DownloadTask> {
 				numOfConcurrentConnections = Integer.valueOf(Config.getProperty("NUM_OF_CONCURRENT_CONNECTION"));
 			} catch (NumberFormatException e) {
 				numOfConcurrentConnections = NUM_OF_CONCURRENT_CONNECTION;
-				logger.error("No config of NUM_OF_CONCURRENT_CONNECTION. To use the default value", e);
+				logger.warn("No config of NUM_OF_CONCURRENT_CONNECTION. To use the default value", e.getMessage());
 			}
 		}
 		

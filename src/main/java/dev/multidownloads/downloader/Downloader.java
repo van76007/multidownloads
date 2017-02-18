@@ -32,7 +32,7 @@ public class Downloader {
 		try {
 			bufSize = Integer.valueOf(Config.getProperty("BUFFER_SIZE"));
 		} catch (NumberFormatException e) {
-			logger.error("No config of BUFFER_SIZE. To use the default value", e);
+			logger.warn("No config of BUFFER_SIZE. To use the default value", e.getMessage());
 		}
 		
 		int numByteRead;

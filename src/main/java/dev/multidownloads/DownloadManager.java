@@ -44,7 +44,9 @@ public class DownloadManager
 		logger.info("Start downloading at {}", now);
 		
 		DownloadCatalog catalog = new DownloadCatalog(catalogFileName);
-		CatalogBuilder.buildCatalog(catalog);
+		CatalogBuilder catalogBuilder = new CatalogBuilder();
+		catalogBuilder.buildCatalog(catalog);
+		
 		if (catalog.isValid()) {
 			downloadWithRetry(catalog.getTasks());
 		} else {
@@ -62,7 +64,7 @@ public class DownloadManager
 			maxRetry = Integer.valueOf(Config.getProperty("MAX_NUM_OF_RETRY"));
 			delay = Integer.valueOf(Config.getProperty("DELAY"));
 		} catch (NumberFormatException e) {
-			logger.error("No config of DELAY or RETRY. To use the default value. ", e);
+			logger.warn("No config of DELAY or RETRY. To use the default value. ", e.getMessage());
 		}
 		
 		int retry = 0;
@@ -91,7 +93,7 @@ public class DownloadManager
 		try {
 			numberOfParallelDownload = Integer.valueOf(Config.getProperty("NUM_OF_PARALLEL_DOWNLOAD"));
 		} catch (NumberFormatException e) {
-			logger.error("No config of NUM_OF_PARALLEL_DOWNLOAD. To use the default value", e);
+			logger.warn("No config of NUM_OF_PARALLEL_DOWNLOAD. To use the default value", e.getMessage());
 		}
 		
 		ExecutorService executor = Executors.newFixedThreadPool(numberOfParallelDownload);

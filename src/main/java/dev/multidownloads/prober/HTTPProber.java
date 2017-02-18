@@ -20,7 +20,7 @@ public class HTTPProber extends DownloadProber {
 			try {
 				timeout = Integer.valueOf(Config.getProperty("TIMEOUT"));
 			} catch (NumberFormatException e) {
-				logger.error("No config of HTTP connection TIMEOUT. To use the default value", e);
+				logger.warn("No config of HTTP connection TIMEOUT. To use the default value", e.getMessage());
 			}
 			conn.setConnectTimeout(timeout);
 			conn.setRequestProperty("Range", "bytes=0-1");
@@ -46,7 +46,7 @@ public class HTTPProber extends DownloadProber {
 			try {
 				timeout = Integer.valueOf(Config.getProperty("TIMEOUT"));
 			} catch (NumberFormatException e) {
-				logger.error("No config of HTTP connection TIMEOUT. To use the default value", e);
+				logger.warn("No config of HTTP connection TIMEOUT. To use the default value", e.getMessage());
 			}
 			conn.setConnectTimeout(timeout);
 			conn.connect();

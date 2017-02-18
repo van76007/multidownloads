@@ -23,6 +23,6 @@ public class UpdateFileDownloadProgress implements DownloadListener {
 	@Override
 	public synchronized void onUpdate(int completeBytes, String fileName) {
 		totalCompleteBytes += completeBytes;
-		logger.debug(String.format("Complete download %d bytes / total %d bytes of file %s\n", totalCompleteBytes,  this.fileSize, fileName));
+		logger.info(String.format("Complete download %d bytes / total %d bytes of file %s\n", totalCompleteBytes,  this.fileSize, fileName));
 	}
 }

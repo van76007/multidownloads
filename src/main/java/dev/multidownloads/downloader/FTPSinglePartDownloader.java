@@ -35,7 +35,7 @@ public class FTPSinglePartDownloader extends Downloader implements Callable<Segm
 			try {
 				timeout = Integer.valueOf(Config.getProperty("TIMEOUT"));
 			} catch (NumberFormatException e) {
-				logger.error("No config of FTP connection TIMEOUT. To use the default value", e);
+				logger.warn("No config of FTP connection TIMEOUT. To use the default value", e.getMessage());
 			}
 			conn.setReadTimeout(timeout);
 			conn.setConnectTimeout(timeout);
