@@ -2,9 +2,9 @@ package dev.multidownloads.downloader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
-import java.util.concurrent.Callable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import dev.multidownloads.config.Config;
 import dev.multidownloads.model.DownloadInfor;
@@ -12,7 +12,7 @@ import dev.multidownloads.model.Segmentation;
 import dev.multidownloads.progress.DownloadListener;
 
 public class Downloader {
-	private static final Logger logger = Logger.getLogger("dev.multidownloads");
+	final static Logger logger = LogManager.getLogger(Downloader.class);
 	private static final int BUFFER_SIZE = 2048;
 	DownloadListener progressListener;
 
@@ -23,8 +23,7 @@ public class Downloader {
 		this.infor = infor;
 		this.seg = seg;
 		this.progressListener = progressListener;
-		StringBuilder sb = new StringBuilder("To download a file ").append(infor.getFileName()).append(" in ").append(seg.toString());
-		logger.log(Level.FINE, sb.toString());
+		logger.info("To download a file {} in {}", infor.getFileName(), seg.toString());
 	}
 	
 	protected void transfer(InputStream input, RandomAccessFile raf, Segmentation seg) throws IOException {
@@ -32,7 +31,7 @@ public class Downloader {
 		try {
 			bufSize = Integer.valueOf(Config.getProperty("BUFFER_SIZE"));
 		} catch (NumberFormatException e) {
-			logger.log(Level.WARNING, "No config of BUFFER_SIZE");
+			logger.error("No config of BUFFER_SIZE. To use the default value", e);
 		}
 		
 		int numByteRead;
@@ -51,7 +50,7 @@ public class Downloader {
 		}
 		
 		if(remaining < 0) {
-			logger.log(Level.SEVERE, "Number of Remaining bytes is negative");
+			logger.error("Number of Remaining bytes is negative");
 		}
 	}
 	

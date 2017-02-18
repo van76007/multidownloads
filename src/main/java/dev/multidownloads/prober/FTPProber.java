@@ -3,16 +3,16 @@ package dev.multidownloads.prober;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import dev.multidownloads.config.Config;
 import dev.multidownloads.model.DownloadInfor;
 
 public class FTPProber extends DownloadProber {
-	private static final Logger logger = Logger.getLogger("dev.multidownloads");
+	final static Logger logger = LogManager.getLogger(FTPProber.class);
 	private static final int TIMEOUT = 10000;
 
 	@Override
@@ -23,7 +23,7 @@ public class FTPProber extends DownloadProber {
 			try {
 				timeout = Integer.valueOf(Config.getProperty("TIMEOUT"));
 			} catch (NumberFormatException e) {
-				logger.log(Level.WARNING, "No config of FTP connection TIMEOUT");
+				logger.error("No config of FTP connection TIMEOUT. To use the default value", e);
 			}
 			conn.setConnectTimeout(timeout);
 			int len = conn.getContentLength();
@@ -31,8 +31,7 @@ public class FTPProber extends DownloadProber {
 			infor.setFileLength(len);
 			infor.setValid(len != -1 ? true : false);	
 		} catch (IOException e) {
-			StringBuilder sb = new StringBuilder("Error in detecting file length of resource: ").append(infor.getUrl());
-			logger.log(Level.WARNING, sb.toString(), e);
+			logger.error("Error in detecting file length of resource: ", infor.getUrl(), e);
 		}
 	}
 
@@ -43,15 +42,13 @@ public class FTPProber extends DownloadProber {
 			FTPClient client = new FTPClient();
 			client.connect(urlWithoutProtocol.substring(0, urlWithoutProtocol.indexOf("/")));
 			
-			System.out.println(client.getReplyString());
-			logger.log(Level.FINE, "Prober: " + client.getReplyString());
+			logger.info("FTP Prober got reply: {}", client.getReplyString());
 			
 			infor.setSupportMultiPartsDownload(client.hasFeature("REST"));
 			client.disconnect();
 			
 		} catch (IndexOutOfBoundsException | IOException e) {
-			StringBuilder sb = new StringBuilder("Error in detecting if support multi parts download: ").append(infor.getUrl());
-			logger.log(Level.WARNING, sb.toString(), e);
+			logger.error("Error in detecting if support multi parts download: {}", infor.getUrl(), e);
 		}
 	}
 }

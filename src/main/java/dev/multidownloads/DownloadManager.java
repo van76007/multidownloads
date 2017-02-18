@@ -1,7 +1,6 @@
 package dev.multidownloads;
 
 import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -12,8 +11,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import dev.multidownloads.builder.CatalogBuilder;
 import dev.multidownloads.config.Config;
@@ -28,34 +28,31 @@ import dev.multidownloads.progress.UpdateBatchDownloadProgress;
  */
 public class DownloadManager 
 {
-	private static final Logger logger = Logger.getLogger("dev.multidownloads");
+	final static Logger logger = LogManager.getLogger(DownloadManager.class);
 	private static final int NUM_OF_PARALLEL_DOWNLOAD = 2;
 	private static final int MAX_NUM_OF_RETRY = 3;
 	private static final int DELAY = 1000*180;
 	private static final int TIMEOUT_IN_SECONDS = 30;
 	
 	public static void main(String[] args) {
-		try{
-			DownloadLogger.setup();
-		} catch(IOException e) {}
 		
 		String catalogFileName = null;
 		if (args.length > 0)
 			catalogFileName = args[0];
 		
 		String now = new SimpleDateFormat("yyy/MM/dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
-		logger.log(Level.FINE, "Start downloading at " + now);
+		logger.info("Start downloading at {}", now);
 		
 		DownloadCatalog catalog = new DownloadCatalog(catalogFileName);
 		CatalogBuilder.buildCatalog(catalog);
 		if (catalog.isValid()) {
 			downloadWithRetry(catalog.getTasks());
 		} else {
-			logger.log(Level.SEVERE, "Impossible to download");
+			logger.warn("Impossible to download");
 		}
 		
 		now = new SimpleDateFormat("yyy/MM/dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
-		logger.log(Level.FINE, "End downloading at " + now);
+		logger.info("End downloading at {}", now);
 	}
 
 	private static void downloadWithRetry(List<DownloadTask> tasks) {
@@ -65,14 +62,14 @@ public class DownloadManager
 			maxRetry = Integer.valueOf(Config.getProperty("MAX_NUM_OF_RETRY"));
 			delay = Integer.valueOf(Config.getProperty("DELAY"));
 		} catch (NumberFormatException e) {
-			logger.log(Level.WARNING, "No config of DELAY or RETRY");
+			logger.error("No config of DELAY or RETRY. To use the default value. ", e);
 		}
 		
 		int retry = 0;
 		int numberOfCompleteFiles = 0;
 		
 		while(!tasks.isEmpty() && retry < maxRetry) {
-			logger.log(Level.FINE, "Number of retry download: " + retry);
+			logger.info("Number of retry download {}", retry);
 			if (retry > 0)
 				try {  Thread.sleep(delay);  } catch (InterruptedException e) { e.printStackTrace(); }
 			
@@ -81,20 +78,20 @@ public class DownloadManager
 		}
 		
 		if (!tasks.isEmpty()) {
-			logger.log(Level.SEVERE, "Some downloads can not complete");
+			logger.error("Some download tasks can not be completed");
 			clearCorruptedDownloadedFiles(tasks);
 		} else {
-			logger.log(Level.FINE, "All downloads finish");
+			logger.info("All download tasks finish");
 		}
 	}
 	
 	private static int downloadOnePass(List<DownloadTask> tasks, int numberOfCompleteFiles) {
-		logger.log(Level.FINE, "Start one pass");
+		logger.info("Start one download pass");
 		int numberOfParallelDownload = NUM_OF_PARALLEL_DOWNLOAD;
 		try {
 			numberOfParallelDownload = Integer.valueOf(Config.getProperty("NUM_OF_PARALLEL_DOWNLOAD"));
 		} catch (NumberFormatException e) {
-			logger.log(Level.WARNING, "No config of NUM_OF_PARALLEL_DOWNLOAD");
+			logger.error("No config of NUM_OF_PARALLEL_DOWNLOAD. To use the default value", e);
 		}
 		
 		ExecutorService executor = Executors.newFixedThreadPool(numberOfParallelDownload);
@@ -104,8 +101,7 @@ public class DownloadManager
 		progress.setNumberOfCompletedFiles(numberOfCompleteFiles);
 		
 		for (DownloadTask task : tasks) {
-			StringBuilder sb = new StringBuilder("Submit a download task to queue. Infor: ").append(task.getInfor().toString());
-			logger.log(Level.FINE, sb.toString());
+			logger.info("Submit a download task to queue. Infor {}", task.getInfor().toString());
 			Callable<DownloadTask> downloadWorker = new DownloadWorker(task, progress);
 			listOfDownloadTasks.add(executor.submit(downloadWorker));
 		}
@@ -116,7 +112,7 @@ public class DownloadManager
 				if (DownloadStatus.DONE == task.getStatus())
 					tasks.remove(task);
 			} catch (InterruptedException | ExecutionException e) {
-				logger.log(Level.SEVERE, "Error in executing download", e);
+				logger.error("Download error", e);
 			}
 		}
 		
@@ -124,10 +120,10 @@ public class DownloadManager
 		try {
 			executor.awaitTermination(TIMEOUT_IN_SECONDS, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
-			logger.log(Level.SEVERE, "Error in terminating download", e);
+			logger.error("Download error", e);
 		}
 		
-		logger.log(Level.FINE, "End one pass");
+		logger.info("End one download pass");
 		return progress.getNumberOfCompletedFiles();
 	}
 	
@@ -137,7 +133,7 @@ public class DownloadManager
 			try {
 				new File(sb.toString()).delete();
 			} catch(Exception e) {
-				logger.log(Level.SEVERE, "Error in deleting corrupted downloaded file", e);
+				logger.error("Error in deleting corrupted downloaded file", e);
 			}
 		}
 	}

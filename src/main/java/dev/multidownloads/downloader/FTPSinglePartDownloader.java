@@ -6,8 +6,9 @@ import java.io.RandomAccessFile;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.concurrent.Callable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import dev.multidownloads.config.Config;
 import dev.multidownloads.model.DownloadInfor;
@@ -16,7 +17,7 @@ import dev.multidownloads.model.Segmentation;
 import dev.multidownloads.progress.DownloadListener;
 
 public class FTPSinglePartDownloader extends Downloader implements Callable<Segmentation> {
-	private static final Logger logger = Logger.getLogger("dev.multidownloads");
+	final static Logger logger = LogManager.getLogger(FTPSinglePartDownloader.class);
 	private static final int TIMEOUT = 30000;
 	
 	public FTPSinglePartDownloader(DownloadInfor infor, Segmentation seg, DownloadListener progressListener) {
@@ -34,7 +35,7 @@ public class FTPSinglePartDownloader extends Downloader implements Callable<Segm
 			try {
 				timeout = Integer.valueOf(Config.getProperty("TIMEOUT"));
 			} catch (NumberFormatException e) {
-				logger.log(Level.WARNING, "No config of FTP connection TIMEOUT");
+				logger.error("No config of FTP connection TIMEOUT. To use the default value", e);
 			}
 			conn.setReadTimeout(timeout);
 			conn.setConnectTimeout(timeout);
@@ -53,8 +54,7 @@ public class FTPSinglePartDownloader extends Downloader implements Callable<Segm
 			this.seg.setStatus(DownloadStatus.DONE);
 		} catch (Exception e) {
 			setError(this.seg);
-			StringBuilder sb = new StringBuilder("Error in downloading 1 segment of file via FTP. Range: ").append(seg.startByte).append("-").append(seg.endByte);
-			logger.log(Level.SEVERE, sb.toString(), e);
+			logger.error("Error in downloading 1 segment of file via FTP. Range: {} - {}", seg.startByte, seg.endByte, e);
 		} finally {
 			if (raf != null) {
 				try {
@@ -69,8 +69,7 @@ public class FTPSinglePartDownloader extends Downloader implements Callable<Segm
 			}
 		}
 		
-		StringBuilder sb = new StringBuilder("Stop downloading seg: ").append(seg.toString());
-		logger.log(Level.FINE, sb.toString());
+		logger.info("Stop downloading seg: {}", seg.toString());
 		return this.seg;
 	}
 

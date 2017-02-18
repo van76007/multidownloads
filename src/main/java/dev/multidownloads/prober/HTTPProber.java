@@ -2,23 +2,16 @@ package dev.multidownloads.prober;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import dev.multidownloads.config.Config;
 import dev.multidownloads.model.DownloadInfor;
 
 public class HTTPProber extends DownloadProber {
-	private static final Logger logger = Logger.getLogger("dev.multidownloads");
+	final static Logger logger = LogManager.getLogger(HTTPProber.class);
 	private static final int TIMEOUT = 10000;
-	
-	/*
-	@Override
-	public void probeResource(DownloadInfor infor) {
-		inquiryIfSupportRangeHeader(infor);
-		inquiryFileLength(infor);
-	}
-	*/
 	
 	protected void inquiryIfSupportMultiPartsDownload(DownloadInfor infor) {
 		try {
@@ -27,7 +20,7 @@ public class HTTPProber extends DownloadProber {
 			try {
 				timeout = Integer.valueOf(Config.getProperty("TIMEOUT"));
 			} catch (NumberFormatException e) {
-				logger.log(Level.WARNING, "No config of HTTP connection TIMEOUT");
+				logger.error("No config of HTTP connection TIMEOUT. To use the default value", e);
 			}
 			conn.setConnectTimeout(timeout);
 			conn.setRequestProperty("Range", "bytes=0-1");
@@ -42,8 +35,7 @@ public class HTTPProber extends DownloadProber {
 			conn.disconnect();
 		} catch (IOException e) {
 			infor.setValid(false);
-			StringBuilder sb = new StringBuilder("Error in detecting if server support multi-part download of of resource: ").append(infor.getUrl());
-			logger.log(Level.SEVERE, sb.toString(), e);
+			logger.error("Error in detecting if server support multi-part download of of resource: {}", infor.getUrl(), e);
 		}
 	}
 	
@@ -54,7 +46,7 @@ public class HTTPProber extends DownloadProber {
 			try {
 				timeout = Integer.valueOf(Config.getProperty("TIMEOUT"));
 			} catch (NumberFormatException e) {
-				logger.log(Level.WARNING, "No config of HTTP connection TIMEOUT");
+				logger.error("No config of HTTP connection TIMEOUT. To use the default value", e);
 			}
 			conn.setConnectTimeout(timeout);
 			conn.connect();
@@ -66,8 +58,7 @@ public class HTTPProber extends DownloadProber {
 			conn.disconnect();
 		} catch (IOException e) {
 			infor.setValid(false);
-			StringBuilder sb = new StringBuilder("Error in detecting size of resource: ").append(infor.getUrl());
-			logger.log(Level.SEVERE, sb.toString(), e);
+			logger.error("Error in detecting size of resource: ", infor.getUrl(), e);
 		}
 	}
 

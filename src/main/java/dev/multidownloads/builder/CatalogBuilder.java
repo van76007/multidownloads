@@ -3,34 +3,35 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import dev.multidownloads.config.Config;
+import dev.multidownloads.config.DownloadCatalogReader;
 import dev.multidownloads.model.DownloadCatalog;
 import dev.multidownloads.model.DownloadInfor;
 import dev.multidownloads.model.DownloadTask;
 import dev.multidownloads.model.Segmentation;
 
 public class CatalogBuilder {
-	private static final Logger logger = Logger.getLogger("dev.multidownloads");
-	//private static final int SEGMENTATION_SIZE = 262144; // 256kB
-	private static final int SEGMENTATION_SIZE = 1048576;
+	final static Logger logger = LogManager.getLogger(CatalogBuilder.class);
+	private static final int SEGMENTATION_SIZE = 262144; // 256kB. Or 1048576 if want to split file into chunk of 1MB each
 	
 	public static void buildCatalog(DownloadCatalog catalog) {
 		int segmentationSize = SEGMENTATION_SIZE;
 		try {
 			segmentationSize = Integer.valueOf(Config.getProperty("SEGMENTATION_SIZE"));
 		} catch (NumberFormatException e) {
-			logger.log(Level.WARNING, "No config of SEGMENTATION_SIZE");
+			logger.error("No config of SEGMENTATION_SIZE. To use the default value", e);
 		}
 		
 		String downloadDiretory = getDownloadDirectory();
 		catalog.setValid(downloadDiretory != null);
+		
 		if (catalog.isValid()) {
 			List<DownloadTask> tasks = buidTasks(downloadDiretory, catalog.getCatalogFileName(), segmentationSize);
 			catalog.setTasks(tasks);
@@ -39,8 +40,8 @@ public class CatalogBuilder {
 	}
 	
 	private static String getDownloadDirectory() {
-		StringBuilder sb1 = new StringBuilder(System.getProperty("user.home")).append(File.separator).append("DL").append(File.separator);
-		String defaultDownloadDirectory = sb1.toString();
+		StringBuilder sb = new StringBuilder(System.getProperty("user.home")).append(File.separator).append("DL").append(File.separator);
+		String defaultDownloadDirectory = sb.toString();
 		String downloadDir = (Config.getProperty("DOWNLOAD_DIR") == null ? defaultDownloadDirectory : Config.getProperty("DOWNLOAD_DIR"));
 		
 		File directory = new File(downloadDir);
@@ -51,8 +52,7 @@ public class CatalogBuilder {
 				existDirectory = directory.mkdirs();
 			} catch (Exception e) {
 				existDirectory = false;
-				StringBuilder sb2 = new StringBuilder("Unable to download due to non-existing download directory").append(downloadDir);
-				logger.log(Level.SEVERE, sb2.toString(), e);
+				logger.error("Unable to download due to non-existing download directory {}", downloadDir, e);
 			}
 		}
 		
@@ -99,81 +99,13 @@ public class CatalogBuilder {
 				}
 			}
 		} catch (SecurityException e) {
-			logger.log(Level.WARNING, "Impossible to determine free disk space", e);
+			logger.error("Impossible to determine free disk space", e);
 		}
 		return isEnoughSpace;
 	}
 	
-	private static List<String> parseDownloadList(String downloadListFile) {
-		//return Arrays.asList("http://www.freeclassicebooks.com/Louisa%20May%20Alcott/A%20Garland%20For%20Girls.pdf");
-		
-		//return Arrays.asList("ftp://mirrors.dotsrc.org/debian-cd/8.7.1/amd64/jigdo-bd/debian-8.7.1-amd64-BD-1.template");
-		
-		//return Arrays.asList("ftp://mirrors.dotsrc.org/debian-cd/8.7.1/amd64/jigdo-bd/debian-8.7.1-amd64-BD-1.jigdo");
-		
-		/*
-		return Arrays.asList("http://www.freeclassicebooks.com/Louisa%20May%20Alcott/A%20Garland%20For%20Girls.pdf",
-				"http://www.freeclassicebooks.com/Louisa%20May%20Alcott/Short%20Stories/A%20Country%20Christmas.pdf");
-		*/
-		
-		/*
-		return Arrays.asList("ftp://mirrors.dotsrc.org/debian-cd/8.7.1/amd64/iso-cd/debian-8.7.1-amd64-CD-1.iso",
-				"http://dl.my-film.org/reza/film/Acid%20480p%20DVDRip-[My-Film].mkv");
-				*/
-		/*
-		return Arrays.asList("http://dl.my-film.org/reza/film/Coral.Reef.Adventure.2003.IMAX.720p-[My-Film].mkv",
-				"http://dl.my-film.org/reza/film/Acid%20480p%20DVDRip-[My-Film].mkv");
-		*/
-		
-		/*
-		return Arrays.asList("https://www.w3.org/Protocols/HTTP/1.1/diff-v11-2068toRev02.doc",
-				"https://www.w3.org/Protocols/HTTP/1.1/rfc2616.pdf");
-				*/
-		
-		/*
-		return Arrays.asList("http://www.freeclassicebooks.com/Louisa%20May%20Alcott/A%20Garland%20For%20Girls.pdf",
-				"http://www.freeclassicebooks.com/Louisa%20May%20Alcott/Short%20Stories/A%20Country%20Christmas.pdf",
-				"ftp://mirrors.dotsrc.org/debian-cd/8.7.1/amd64/iso-cd/debian-8.7.1-amd64-CD-1.iso");
-		*/
-		
-		/*
-		return Arrays.asList("http://www.freeclassicebooks.com/Louisa%20May%20Alcott/A%20Garland%20For%20Girls.pdf",
-				"http://dl.my-film.org/reza/film/Coral.Reef.Adventure.2003.IMAX.720p-[My-Film].mkv");
-		*/
-		
-		/*
-		return Arrays.asList("http://www.freeclassicebooks.com/Louisa%20May%20Alcott/A%20Garland%20For%20Girls.pdf",
-				"http://dl.my-film.org/reza/film/Coral.Reef.Adventure.2003.IMAX.720p-[My-Film].mkv",
-				"http://www.freeclassicebooks.com/Louisa%20May%20Alcott/Short%20Stories/A%20Country%20Christmas.pdf",
-				"ftp://mirrors.dotsrc.org/debian-cd/8.7.1/amd64/iso-cd/debian-8.7.1-amd64-CD-1.iso");
-		*/
-		
-		
-		return Arrays.asList(
-				"http://dl.my-film.org/reza/film/Coral.Reef.Adventure.2003.IMAX.720p-[My-Film].mkv",
-				"http://www.freeclassicebooks.com/Louisa%20May%20Alcott/A%20Garland%20For%20Girls.pdf",
-				"http://www.freeclassicebooks.com/Louisa%20May%20Alcott/Short%20Stories/A%20Country%20Christmas.pdf",
-				"ftp://mirrors.dotsrc.org/debian-cd/8.7.1/amd64/jigdo-bd/debian-8.7.1-amd64-BD-1.template;A;AA",
-				"ftp://mirrors.dotsrc.org/debian-cd/8.7.1/amd64/jigdo-bd/debian-8.7.1-amd64-BD-1.jigdo");
-		
-		
-		/*
-		return Arrays.asList(
-				"http://www.freeclassicebooks.com/Agatha%20Christie/The%20Secret%20Adversary.pdf",
-				"http://www.freeclassicebooks.com/charlotte%20bronte/Jane%20Eyre.pdf");
-		*/
-		
-		/*
-		return Arrays.asList("ftp://mirrors.dotsrc.org/debian-cd/8.7.1/multi-arch/bt-dvd/debian-8.7.1-i386-amd64-source-DVD-1.iso.torrent",
-				"ftp://mirrors.dotsrc.org/debian-cd/8.7.1/amd64/jigdo-bd/debian-8.7.1-amd64-BD-1.jigdo",
-				"ftp://mirrors.dotsrc.org/debian-cd/8.7.1/amd64/jigdo-bd/debian-8.7.1-amd64-BD-1.template");
-		*/
-		
-		/*
-		return Arrays.asList("ftp://mirrors.dotsrc.org/debian-cd/8.7.1/amd64/jigdo-bd/debian-8.7.1-amd64-BD-1.template",
-				"ftp://mirrors.dotsrc.org/debian-cd/8.7.1/amd64/jigdo-bd/debian-8.7.1-amd64-BD-1.jigdo");
-		*/
-		//return DownloadListReader.readDownloadList(downloadListFile);
+	private static List<String> parseDownloadList(String downloadCatalogFile) {
+		return DownloadCatalogReader.readDownloadCatalog(downloadCatalogFile);
 	}
 	
 	private static List<Segmentation> buildSegmentations(int fileSize, int segmentationSize) {

@@ -1,10 +1,10 @@
 package dev.multidownloads.progress;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class UpdateBatchDownloadProgress implements DownloadListener {
-	private static final Logger logger = Logger.getLogger("dev.multidownloads");
+	final static Logger logger = LogManager.getLogger(UpdateBatchDownloadProgress.class);
 	private int totalNumberOfFiles;
 	private int numberOfCompletedFiles;
 
@@ -23,6 +23,6 @@ public class UpdateBatchDownloadProgress implements DownloadListener {
 	@Override
 	public synchronized void onUpdate(int completeFiles, String unused) {
 		numberOfCompletedFiles += completeFiles;
-		logger.log(Level.FINE, String.format("Complete download %d files / total %d files\n", numberOfCompletedFiles, this.totalNumberOfFiles));
+		logger.debug(String.format("Complete download %d files / total %d files\n", numberOfCompletedFiles, this.totalNumberOfFiles));
 	}
 }

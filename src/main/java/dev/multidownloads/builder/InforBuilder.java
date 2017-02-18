@@ -2,8 +2,9 @@ package dev.multidownloads.builder;
 
 import java.util.ArrayList;
 import java.util.StringTokenizer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import dev.multidownloads.config.Config;
 import dev.multidownloads.factory.ProberFactory;
@@ -12,9 +13,9 @@ import dev.multidownloads.model.Protocol;
 import dev.multidownloads.prober.Prober;
 
 public class InforBuilder {
+	final static Logger logger = LogManager.getLogger(InforBuilder.class);
 	private static String SEPARATOR = ";";
 	
-	private static final Logger logger = Logger.getLogger("dev.multidownloads");
 	public static DownloadInfor buildInfor(String catalogLine, String downloadDirectory) {
 		
 		DownloadInfor infor = new DownloadInfor();
@@ -72,7 +73,7 @@ public class InforBuilder {
 		try {
 			proto = url.substring(0, url.indexOf("://"));
 		} catch (IndexOutOfBoundsException  e) {
-			logger.log(Level.SEVERE, "Impossible to determine protocol", e);
+			logger.error("Impossible to determine download protocol", e);
 		}
 		return Protocol.getEnum(proto);
 	}
@@ -84,7 +85,7 @@ public class InforBuilder {
 			infor.setValid(fileName.indexOf(".") != -1);
 		} catch (IndexOutOfBoundsException e) {
 			infor.setValid(false);
-			logger.log(Level.SEVERE, "Impossible to determine file name", e);
+			logger.error("Impossible to determine file name", e);
 		}
 		return infor.isValid();
 	}

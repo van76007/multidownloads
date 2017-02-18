@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.util.concurrent.Callable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 
@@ -17,8 +17,7 @@ import dev.multidownloads.model.Segmentation;
 import dev.multidownloads.progress.DownloadListener;
 
 public class FTPMultiPartsDownloader extends Downloader implements Callable<Segmentation> {
-	
-	private static final Logger logger = Logger.getLogger("dev.multidownloads");
+	final static Logger logger = LogManager.getLogger(FTPMultiPartsDownloader.class);
 	private static final int TIMEOUT = 30000;
 	private static final String DEFAULT_CREDENTIAL = "anonymous";
 	
@@ -38,13 +37,13 @@ public class FTPMultiPartsDownloader extends Downloader implements Callable<Segm
 			try {
 				timeout = Integer.valueOf(Config.getProperty("TIMEOUT"));
 			} catch (NumberFormatException e) {
-				logger.log(Level.WARNING, "No config of FTP connection TIMEOUT");
+				logger.error("No config of FTP connection TIMEOUT. To use the default value", e);
 			}
 			client.setConnectTimeout(timeout);
 			
 			String urlWithoutProtocol = infor.getUrl().substring(infor.getUrl().indexOf("://") + 3);
 			client.connect(urlWithoutProtocol.substring(0, urlWithoutProtocol.indexOf("/")));
-			logger.log(Level.FINE, "connect: " + client.getReplyString());
+			logger.debug("FTP connect got reply {}", client.getReplyString());
 			
 			client.setSoTimeout(TIMEOUT);
 			
@@ -53,19 +52,19 @@ public class FTPMultiPartsDownloader extends Downloader implements Callable<Segm
 			} else {
 				client.login(infor.getUserName(), infor.getPassword());
 			}
-			logger.log(Level.FINE, "loggin: " + client.getReplyString());
+			logger.debug("FTP loggin got reply {}", client.getReplyString());
 			
 			client.enterLocalPassiveMode();
 			client.setFileType(FTP.BINARY_FILE_TYPE);
-			logger.log(Level.FINE, "enter passive mode: " + client.getReplyString());
+			logger.debug("Enter passive mode got reply {}", client.getReplyString());
 			
 			seg.setStatus(DownloadStatus.DOWNLOADING);
 			
 			client.setRestartOffset(seg.startByte);
-			logger.log(Level.FINE, "setRestartOffset: " + client.getReplyString());
+			logger.debug("SetRestartOffset got reply {}", client.getReplyString());
 			
 			in = client.retrieveFileStream(urlWithoutProtocol.substring(urlWithoutProtocol.indexOf("/")));
-			logger.log(Level.FINE, "retrieveFileStream: " + client.getReplyString());
+			logger.debug("RetrieveFileStream {}", client.getReplyString());
 			
 			// open the output file and seek to the start location
 			StringBuilder sb = new StringBuilder(infor.getDownloadDirectory()).append(infor.getFileName());
@@ -77,8 +76,7 @@ public class FTPMultiPartsDownloader extends Downloader implements Callable<Segm
 			this.seg.setStatus(DownloadStatus.DONE);
 		} catch (Exception e) {
 			setError(this.seg);
-			StringBuilder sb = new StringBuilder("Error in downloading 1 segment of file via FTP. Range: ").append(seg.startByte).append("-").append(seg.endByte);
-			logger.log(Level.SEVERE, sb.toString(), e);
+			logger.error("Error in downloading 1 segment of file via FTP. Range: {} - {}", seg.startByte, seg.endByte, e);
 		} finally {
 			if (raf != null) {
 				try {
@@ -104,8 +102,7 @@ public class FTPMultiPartsDownloader extends Downloader implements Callable<Segm
 			}
 		}
 		
-		StringBuilder sb = new StringBuilder("Stop downloading seg: ").append(seg.toString());
-		logger.log(Level.FINE, sb.toString());
+		logger.info("Stop downloading seg {}", seg.toString());
 		return this.seg;
 	}
 

@@ -16,11 +16,9 @@ public class DownloaderFactory {
 		if (Protocol.HTTP == infor.getProtocol()) {
 			return new HTTPDownloader(infor, seg, progressListener);
 		}
-		
 		if (Protocol.FTP == infor.getProtocol() && !infor.isSupportMultiPartsDownload()) {
 			return new FTPSinglePartDownloader(infor, seg, progressListener);
 		}
-		
 		if (Protocol.FTP == infor.getProtocol() && infor.isSupportMultiPartsDownload()) {
 			return new FTPMultiPartsDownloader(infor, seg, progressListener);
 		}

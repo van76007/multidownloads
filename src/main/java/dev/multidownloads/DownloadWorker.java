@@ -7,8 +7,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import dev.multidownloads.config.Config;
 import dev.multidownloads.factory.DownloaderFactory;
@@ -19,7 +20,7 @@ import dev.multidownloads.progress.DownloadListener;
 import dev.multidownloads.progress.UpdateFileDownloadProgress;
 
 public class DownloadWorker implements Callable<DownloadTask> {
-	private static final Logger logger = Logger.getLogger("dev.multidownloads");
+	final static Logger logger = LogManager.getLogger(DownloadWorker.class);
 	private static final int NUM_OF_CONCURRENT_CONNECTION = 5;
 	private static final int TIMEOUT_IN_SECONDS = 30;
 	
@@ -39,7 +40,7 @@ public class DownloadWorker implements Callable<DownloadTask> {
 				numOfConcurrentConnections = Integer.valueOf(Config.getProperty("NUM_OF_CONCURRENT_CONNECTION"));
 			} catch (NumberFormatException e) {
 				numOfConcurrentConnections = NUM_OF_CONCURRENT_CONNECTION;
-				logger.log(Level.WARNING, "No config of NUM_OF_CONCURRENT_CONNECTION");
+				logger.error("No config of NUM_OF_CONCURRENT_CONNECTION. To use the default value", e);
 			}
 		}
 		
@@ -61,7 +62,7 @@ public class DownloadWorker implements Callable<DownloadTask> {
 					task.getSegmentations().remove(seg);
 				}
 			} catch (InterruptedException | ExecutionException e) {
-				logger.log(Level.SEVERE, "Error in downloading some parts of file", e);
+				logger.error("Error in downloading some parts of file", e);
 			}
 		}
 		
@@ -77,11 +78,10 @@ public class DownloadWorker implements Callable<DownloadTask> {
 		try {
 			executor.awaitTermination(TIMEOUT_IN_SECONDS, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
-			logger.log(Level.SEVERE, "Error in terminating download of 1 file", e);
+			logger.error("Error in terminating download one file", e);
 		}
 		
-		StringBuilder sb = new StringBuilder("Stop retrieving resource: ").append(task.getInfor().getFileName());
-		logger.log(Level.FINE, sb.toString());
+		logger.info("Stop retrieving resource {}", task.getInfor().getFileName());
 		return this.task;
 	}
 }

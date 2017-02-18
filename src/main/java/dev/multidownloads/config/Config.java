@@ -2,11 +2,12 @@ package dev.multidownloads.config;
 
 import java.io.FileInputStream;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class Config {
-	private static final Logger logger = Logger.getLogger("dev.multidownloads");
+	final static Logger logger = LogManager.getLogger(Config.class);
 	private static Properties defaultProps = new Properties();
 	
 	static {
@@ -15,7 +16,7 @@ public class Config {
 	        defaultProps.load(in);
 	        in.close();
 	    } catch (Exception e) {
-	    	logger.log(Level.SEVERE, "Found no config file. To use hard-coded download parameters");
+	    	logger.error("Found no config file. To use hard-coded download parameters", e);
 	    }
 	}
 	
