@@ -65,6 +65,9 @@ public class FTPMultiPartsDownloader extends Downloader implements Callable<Segm
 			
 			in = client.retrieveFileStream(urlWithoutProtocol.substring(urlWithoutProtocol.indexOf("/")));
 			logger.debug("RetrieveFileStream {}", client.getReplyString());
+			if(in == null) {
+				throw new Exception("Can not retrieve remote resource");
+			}
 			
 			// open the output file and seek to the start location
 			StringBuilder sb = new StringBuilder(infor.getDownloadDirectory()).append(infor.getFileName());
@@ -76,7 +79,7 @@ public class FTPMultiPartsDownloader extends Downloader implements Callable<Segm
 			this.seg.setStatus(DownloadStatus.DONE);
 		} catch (Exception e) {
 			setError(this.seg);
-			logger.error("Error in downloading 1 segment of file via FTP. Range: {} - {}", seg.startByte, seg.endByte, e);
+			logger.error("Error in downloading 1 segment of file via FTP. Range: {} - {}. Error: {}", seg.startByte, seg.endByte, e.getMessage());
 		} finally {
 			if (raf != null) {
 				try {
@@ -104,6 +107,11 @@ public class FTPMultiPartsDownloader extends Downloader implements Callable<Segm
 		
 		logger.info("Stop downloading seg {}", seg.toString());
 		return this.seg;
+	}
+	
+	@Override
+	public void setError(Segmentation seg) {
+		seg.setStatus(DownloadStatus.ABORTED);
 	}
 
 }

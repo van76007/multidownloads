@@ -11,7 +11,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import dev.multidownloads.config.Config;
-import dev.multidownloads.config.DownloadCatalogReader;
 import dev.multidownloads.model.DownloadCatalog;
 import dev.multidownloads.model.DownloadInfor;
 import dev.multidownloads.model.DownloadTask;
@@ -19,35 +18,58 @@ import dev.multidownloads.model.Segmentation;
 
 public class CatalogBuilder {
 	final static Logger logger = LogManager.getLogger(CatalogBuilder.class);
-	private static final int SEGMENTATION_SIZE = 262144; // 256kB. Or 1048576 if want to split file into chunk of 1MB each
-	
+	private static final int SEGMENTATION_SIZE = 1048576; // 1048576 if want to split file into chunk of 1MB each. Or 262144 = 256kB
+
 	InforBuilder builder = new InforBuilder();
-	
+	CatalogReader reader = new CatalogReader();
 	public void setBuilder(InforBuilder builder) {
 		this.builder = builder;
 	}
-
-	public void buildCatalog(DownloadCatalog catalog) {
+	public void setReader(CatalogReader reader) {
+		this.reader = reader;
+	}
+	
+	public void buildCatalog(DownloadCatalog catalog, String catalogFileName) {
 		int segmentationSize = SEGMENTATION_SIZE;
 		try {
 			segmentationSize = Integer.valueOf(Config.getProperty("SEGMENTATION_SIZE"));
 		} catch (NumberFormatException e) {
-			logger.warn("No config of SEGMENTATION_SIZE. To use the default value", e.getMessage());
+			logger.warn("No config of SEGMENTATION_SIZE. To use the default value as {}", e.getMessage());
 		}
 		
 		String downloadDiretory = getDownloadDirectory();
 		catalog.setValid(downloadDiretory != null);
 		
 		if (catalog.isValid()) {
-			List<DownloadTask> tasks = buidTasks(downloadDiretory, catalog.getCatalogFileName(), segmentationSize);
+			List<DownloadTask> tasks = buidTasks(downloadDiretory, catalogFileName, segmentationSize);
 			catalog.setTasks(tasks);
 			catalog.setValid(checkIfEnoughDiskspace(tasks, Paths.get(downloadDiretory)));
 		}
 	}
 	
+	public String getDownloadDirectory() {
+		StringBuilder sb = new StringBuilder(System.getProperty("user.home")).append(File.separator).append("DL").append(File.separator);
+		String defaultDownloadDirectory = sb.toString();
+		String downloadDir = (Config.getProperty("DOWNLOAD_DIR") == null ? defaultDownloadDirectory : Config.getProperty("DOWNLOAD_DIR"));
+		
+		File directory = new File(downloadDir);
+		boolean existDirectory = directory.exists() && directory.isDirectory();
+		
+		if (!existDirectory) {
+			try {
+				existDirectory = directory.mkdirs();
+			} catch (Exception e) {
+				existDirectory = false;
+				logger.error("Unable to download due to non-existing download directory {}", downloadDir, e);
+			}
+		}
+		
+		return (existDirectory ? downloadDir : null);
+	}
+
 	private List<DownloadTask> buidTasks(String downloadDiretory, String catalogFileName, int segmentationSize) {
 		List<DownloadTask> tasks = new ArrayList<DownloadTask>();
-		List<String> catalogLines = parseDownloadList(catalogFileName);
+		List<String> catalogLines = reader.readDownloadCatalog(catalogFileName);
 		List<DownloadInfor> infors= builder.buildInfors(catalogLines, downloadDiretory);
 		
 		for (DownloadInfor infor : infors) {
@@ -69,10 +91,6 @@ public class CatalogBuilder {
 		return tasks;
 	}
 	
-	private List<String> parseDownloadList(String downloadCatalogFile) {
-		return DownloadCatalogReader.readDownloadCatalog(downloadCatalogFile);
-	}
-	
 	private List<Segmentation> buildSegmentations(int fileSize, int segmentationSize) {
 		List<Segmentation> segs = new ArrayList<Segmentation>();
 		
@@ -86,26 +104,6 @@ public class CatalogBuilder {
 		}
 		
 		return segs;
-	}
-	
-	private String getDownloadDirectory() {
-		StringBuilder sb = new StringBuilder(System.getProperty("user.home")).append(File.separator).append("DL").append(File.separator);
-		String defaultDownloadDirectory = sb.toString();
-		String downloadDir = (Config.getProperty("DOWNLOAD_DIR") == null ? defaultDownloadDirectory : Config.getProperty("DOWNLOAD_DIR"));
-		
-		File directory = new File(downloadDir);
-		boolean existDirectory = directory.exists() && directory.isDirectory();
-		
-		if (!existDirectory) {
-			try {
-				existDirectory = directory.mkdirs();
-			} catch (Exception e) {
-				existDirectory = false;
-				logger.error("Unable to download due to non-existing download directory {}", downloadDir, e);
-			}
-		}
-		
-		return (existDirectory ? downloadDir : null);
 	}
 	
 	private boolean checkIfEnoughDiskspace(List<DownloadTask> tasks, Path parentDirectory) {

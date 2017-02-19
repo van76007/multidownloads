@@ -5,7 +5,7 @@ import java.util.List;
 
 public class DownloadCatalog {
 	private String catalogFileName;
-	public DownloadCatalog(String catalogFileName) {
+	public void setCatalogFileName(String catalogFileName) {
 		this.catalogFileName = catalogFileName;
 	}
 	public String getCatalogFileName() {

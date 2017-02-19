@@ -16,48 +16,49 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import dev.multidownloads.builder.CatalogBuilder;
+import dev.multidownloads.builder.CatalogReader;
 import dev.multidownloads.config.Config;
 import dev.multidownloads.model.DownloadCatalog;
 import dev.multidownloads.model.DownloadStatus;
 import dev.multidownloads.model.DownloadTask;
 import dev.multidownloads.progress.UpdateBatchDownloadProgress;
 
-/**
- * Hello world!
- *
- */
-public class DownloadManager 
-{
+public class DownloadManager {
 	final static Logger logger = LogManager.getLogger(DownloadManager.class);
 	private static final int NUM_OF_PARALLEL_DOWNLOAD = 2;
-	private static final int MAX_NUM_OF_RETRY = 3;
+	private static final int MAX_NUM_OF_RETRY = 2;
 	private static final int DELAY = 1000*180;
 	private static final int TIMEOUT_IN_SECONDS = 30;
 	
-	public static void main(String[] args) {
-		
-		String catalogFileName = null;
-		if (args.length > 0)
-			catalogFileName = args[0];
-		
+	CatalogBuilder catalogBuilder = new CatalogBuilder();
+	public CatalogBuilder getCatalogBuilder() {
+		return catalogBuilder;
+	}
+	public void setCatalogBuilder(CatalogBuilder catalogBuilder) {
+		this.catalogBuilder = catalogBuilder;
+	}
+
+	public boolean download(String catalogFileName) {
+		boolean downloadResult = false;
 		String now = new SimpleDateFormat("yyy/MM/dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
 		logger.info("Start downloading at {}", now);
 		
-		DownloadCatalog catalog = new DownloadCatalog(catalogFileName);
-		CatalogBuilder catalogBuilder = new CatalogBuilder();
-		catalogBuilder.buildCatalog(catalog);
+		DownloadCatalog catalog = new DownloadCatalog();
+		catalogBuilder.buildCatalog(catalog, catalogFileName);
 		
 		if (catalog.isValid()) {
-			downloadWithRetry(catalog.getTasks());
+			downloadResult = downloadWithRetry(catalog.getTasks());
 		} else {
 			logger.warn("Impossible to download");
 		}
 		
 		now = new SimpleDateFormat("yyy/MM/dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
 		logger.info("End downloading at {}", now);
+		return downloadResult;
 	}
-
-	private static void downloadWithRetry(List<DownloadTask> tasks) {
+	
+	private boolean downloadWithRetry(List<DownloadTask> tasks) {
+		boolean downloadResult = false;
 		int maxRetry = MAX_NUM_OF_RETRY;
 		int delay = DELAY;
 		try {
@@ -83,11 +84,13 @@ public class DownloadManager
 			logger.error("Some download tasks can not be completed");
 			clearCorruptedFiles(tasks);
 		} else {
+			downloadResult = true;
 			logger.info("All download tasks finish");
 		}
+		return downloadResult;
 	}
 	
-	private static int downloadOnePass(List<DownloadTask> tasks, int numberOfCompleteFiles) {
+	private int downloadOnePass(List<DownloadTask> tasks, int numberOfCompleteFiles) {
 		logger.info("Start one download pass");
 		int numberOfParallelDownload = NUM_OF_PARALLEL_DOWNLOAD;
 		try {
@@ -129,7 +132,7 @@ public class DownloadManager
 		return progress.getNumberOfCompletedFiles();
 	}
 	
-	private static void clearCorruptedFiles(List<DownloadTask> tasks) {
+	private void clearCorruptedFiles(List<DownloadTask> tasks) {
 		for (DownloadTask task : tasks) {
 			StringBuilder sb = new StringBuilder(task.getInfor().getDownloadDirectory()).append(task.getInfor().getFileName());
 			try {

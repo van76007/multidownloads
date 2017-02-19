@@ -9,6 +9,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import junit.framework.TestCase;
 
 import dev.multidownloads.builder.CatalogBuilder;
 import dev.multidownloads.builder.InforBuilder;
@@ -16,7 +17,6 @@ import dev.multidownloads.model.DownloadCatalog;
 import dev.multidownloads.model.DownloadInfor;
 import dev.multidownloads.model.DownloadTask;
 import dev.multidownloads.model.Segmentation;
-import junit.framework.TestCase;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CatalogBuilderTest extends TestCase {
@@ -27,7 +27,7 @@ public class CatalogBuilderTest extends TestCase {
 	InforBuilder inforBuilder2;
 	
 	@Before
-	public void setUp(){
+	public void setUp() {
 		inforBuilder1 = Mockito.spy(new InforBuilder());
 		Mockito.when(inforBuilder1.buildInfors(ArgumentMatchers.<String>anyList(), Mockito.anyString())).thenReturn(buidMockInfors1());
 		
@@ -41,8 +41,8 @@ public class CatalogBuilderTest extends TestCase {
     public void testDownloadTaskFileSizesShouldBeInAscendingOrder() {
 		catalogBuilder.setBuilder(inforBuilder1);
 		
-		DownloadCatalog catalog = new DownloadCatalog("ACatalogFile");
-		catalogBuilder.buildCatalog(catalog);
+		DownloadCatalog catalog = new DownloadCatalog();
+		catalogBuilder.buildCatalog(catalog, null);
 		
 		List<DownloadTask> tasks = catalog.getTasks();
 		assertTrue(tasks.size() == 2);
@@ -62,8 +62,8 @@ public class CatalogBuilderTest extends TestCase {
     public void testSegmentationsShouldHaveOneSegIfNotSupportMultiPartsDownload() {
 		catalogBuilder.setBuilder(inforBuilder1);
 		
-		DownloadCatalog catalog = new DownloadCatalog("ACatalogFile");
-		catalogBuilder.buildCatalog(catalog);
+		DownloadCatalog catalog = new DownloadCatalog();
+		catalogBuilder.buildCatalog(catalog, null);
 		
 		assertTrue(catalog.getTasks().size() == 2);
 		
@@ -82,8 +82,8 @@ public class CatalogBuilderTest extends TestCase {
     public void testSegmentationsShouldNotOverlap() {
 		catalogBuilder.setBuilder(inforBuilder2);
 		
-		DownloadCatalog catalog = new DownloadCatalog("ACatalogFile");
-		catalogBuilder.buildCatalog(catalog);
+		DownloadCatalog catalog = new DownloadCatalog();
+		catalogBuilder.buildCatalog(catalog, null);
 		
 		assertTrue(catalog.getTasks().size() == 1);
 		
