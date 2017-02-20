@@ -16,6 +16,15 @@ import dev.multidownloads.model.DownloadStatus;
 import dev.multidownloads.model.Segmentation;
 import dev.multidownloads.progress.DownloadListener;
 
+/**
+ * A class to download a file via FTP protocol if the server does not support the REST command
+ * Therefore the remote file could not be split into multiple parts retrieved concurrently.
+ * This class only download 1 big segmentation which is the whole file.
+ * The class implements the Callable interface so it can be executed in a thread and return result after finish
+ * @see Downloader
+ * @author vanvu
+ *
+ */
 public class FTPSinglePartDownloader extends Downloader implements Callable<Segmentation> {
 	final static Logger logger = LogManager.getLogger(FTPSinglePartDownloader.class);
 	private static final int TIMEOUT = 30000;
@@ -24,6 +33,9 @@ public class FTPSinglePartDownloader extends Downloader implements Callable<Segm
 		super(infor, seg, progressListener);
 	}
 	
+	/**
+	 * This method download a file by FTP protocol
+	 */
 	@Override
 	public Segmentation call() throws Exception {
 		InputStream in = null;
@@ -35,7 +47,7 @@ public class FTPSinglePartDownloader extends Downloader implements Callable<Segm
 			try {
 				timeout = Integer.valueOf(Config.getProperty("TIMEOUT"));
 			} catch (NumberFormatException e) {
-				logger.warn("No config of FTP connection TIMEOUT. To use the default value", e.getMessage());
+				logger.warn("No config of FTP connection TIMEOUT. To use the default value {}", TIMEOUT);
 			}
 			conn.setReadTimeout(timeout);
 			conn.setConnectTimeout(timeout);

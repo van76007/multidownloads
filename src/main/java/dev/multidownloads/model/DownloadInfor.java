@@ -1,5 +1,10 @@
 package dev.multidownloads.model;
 
+/**
+ * This models the download information associated with an URL
+ * @author vanvu
+ *
+ */
 public class DownloadInfor {
 
 	private String url = "";

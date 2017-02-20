@@ -9,7 +9,6 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import junit.framework.TestCase;
 
 import dev.multidownloads.builder.CatalogBuilder;
 import dev.multidownloads.builder.InforBuilder;
@@ -17,7 +16,13 @@ import dev.multidownloads.model.DownloadCatalog;
 import dev.multidownloads.model.DownloadInfor;
 import dev.multidownloads.model.DownloadTask;
 import dev.multidownloads.model.Segmentation;
+import junit.framework.TestCase;
 
+/**
+ * Unit test for CatalogBuilder class
+ * @author vanvu
+ *
+ */
 @RunWith(MockitoJUnitRunner.class)
 public class CatalogBuilderTest extends TestCase {
 	private static final int FILE_LEN = 262144*10;
@@ -42,7 +47,7 @@ public class CatalogBuilderTest extends TestCase {
 		catalogBuilder.setBuilder(inforBuilder1);
 		
 		DownloadCatalog catalog = new DownloadCatalog();
-		catalogBuilder.buildCatalog(catalog, null);
+		catalogBuilder.buildCatalog(catalog, "");
 		
 		List<DownloadTask> tasks = catalog.getTasks();
 		assertTrue(tasks.size() == 2);
@@ -63,7 +68,7 @@ public class CatalogBuilderTest extends TestCase {
 		catalogBuilder.setBuilder(inforBuilder1);
 		
 		DownloadCatalog catalog = new DownloadCatalog();
-		catalogBuilder.buildCatalog(catalog, null);
+		catalogBuilder.buildCatalog(catalog, "");
 		
 		assertTrue(catalog.getTasks().size() == 2);
 		
@@ -83,7 +88,7 @@ public class CatalogBuilderTest extends TestCase {
 		catalogBuilder.setBuilder(inforBuilder2);
 		
 		DownloadCatalog catalog = new DownloadCatalog();
-		catalogBuilder.buildCatalog(catalog, null);
+		catalogBuilder.buildCatalog(catalog, "");
 		
 		assertTrue(catalog.getTasks().size() == 1);
 		

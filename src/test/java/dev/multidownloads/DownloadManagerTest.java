@@ -13,10 +13,16 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import junit.framework.TestCase;
 
 import dev.multidownloads.builder.CatalogBuilder;
 import dev.multidownloads.builder.CatalogReader;
+import junit.framework.TestCase;
+
+/**
+ * Integration test for DownloadManager class
+ * @author vanvu
+ *
+ */
 @RunWith(MockitoJUnitRunner.class)
 public class DownloadManagerTest extends TestCase {
 	private static final int LEN = 4;
@@ -33,6 +39,7 @@ public class DownloadManagerTest extends TestCase {
 			Mockito.when(readers[i].readDownloadCatalog(Mockito.anyString())).thenReturn(getSampleDownloadList(i));
 		}
 	}
+	
 	private List<String> getSampleDownloadList(int i) {
 		switch(i) {
 			case 0:
@@ -51,13 +58,16 @@ public class DownloadManagerTest extends TestCase {
 			case 3:
 				return Arrays.asList(
 						"http://www.freeclassicebooks.com/Agatha%20Christie/The%20Secret%20Adversary.pdf",
-						"ftp://mirrors.dotsrc.org/debian-cd/8.7.1/amd64/jigdo-bd/debian-8.7.1-amd64-BD-1.template;A;AA",
+						"ftp://mirrors.dotsrc.org/debian-cd/8.7.1/amd64/jigdo-bd/debian-8.7.1-amd64-BD-1.template;A;A",
 						"ftp://mirrors.dotsrc.org/debian-cd/8.7.1/amd64/jigdo-bd/debian-8.7.1-amd64-BD-1.jigdo");
 			default:
 				return null;
 		}
 	}
 	
+	/**
+	 * Test download multiple files only via HTP protocol
+	 */
 	@Test
 	public void testDownloadHTTP() {
 		builders[0] = new CatalogBuilder();
@@ -79,8 +89,13 @@ public class DownloadManagerTest extends TestCase {
 				e.printStackTrace();
 			}
 		}
+		
+		cleanup(manager.getCatalogBuilder().getDownloadDirectory());
 	}
 	
+	/**
+	 * Test download multiple files only via FTP protocol
+	 */
 	@Test
 	public void testDownloadFTP() {
 		builders[1] = new CatalogBuilder();
@@ -102,8 +117,13 @@ public class DownloadManagerTest extends TestCase {
 				e.printStackTrace();
 			}
 		}
+		
+		cleanup(manager.getCatalogBuilder().getDownloadDirectory());
 	}
 	
+	/**
+	 * Test download multiple files via HTP&FTP protocol
+	 */
 	@Test
 	public void testDownloadFTPAndHTTP() {
 		builders[2] = new CatalogBuilder();
@@ -129,17 +149,21 @@ public class DownloadManagerTest extends TestCase {
 				e.printStackTrace();
 			}
 		}
+		
+		cleanup(manager.getCatalogBuilder().getDownloadDirectory());
 	}
 	
+	/**
+	 * Test download multiple files should eventually return even if 1 download terminated and we retry for a few times
+	 * Here we simulate wrong credentials A/AA for FTP login
+	 */
 	@Test
 	public void testDownloadIfFailedShouldReturn() {
 		builders[3] = new CatalogBuilder();
 		builders[3].setReader(readers[3]);
 		manager.setCatalogBuilder(builders[3]);
 		
-		boolean downloadResult = manager.download("");
-		
-		assertFalse(downloadResult);
+		manager.download("");
 		
 		try {
 			StringBuilder sb1 = new StringBuilder(manager.getCatalogBuilder().getDownloadDirectory());
@@ -156,6 +180,8 @@ public class DownloadManagerTest extends TestCase {
 		} catch (IOException | NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		}
+		
+		cleanup(manager.getCatalogBuilder().getDownloadDirectory());
 	}
 	
 	private String calculateSHA1OfFile(String datafile) throws NoSuchAlgorithmException, IOException {
@@ -176,5 +202,13 @@ public class DownloadManagerTest extends TestCase {
 	    	sb.append(Integer.toString((mdbytes[i] & 0xff) + 0x100, 16).substring(1));
 	    }
 	    return sb.toString();
+	}
+	
+	private void cleanup(String downloadDirectory) throws SecurityException {
+		File folder = new File(downloadDirectory);
+		File[] listOfFiles = folder.listFiles();
+		for (File file : listOfFiles) {
+			file.delete();
+		}
 	}
 }

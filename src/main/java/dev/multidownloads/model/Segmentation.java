@@ -1,8 +1,15 @@
 package dev.multidownloads.model;
 
+/**
+ * This model a part of file to be retrieved concurrently
+ * @author vanvu
+ *
+ */
 public class Segmentation {
 	private DownloadStatus status = DownloadStatus.QUEUED;
+	// Start of the file segmentation
 	public int startByte;
+	// End of the file segmentation
 	public int endByte;
 	
 	public Segmentation() {}

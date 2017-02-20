@@ -5,10 +5,10 @@ import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.util.concurrent.Callable;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import dev.multidownloads.config.Config;
 import dev.multidownloads.model.DownloadInfor;
@@ -16,6 +16,15 @@ import dev.multidownloads.model.DownloadStatus;
 import dev.multidownloads.model.Segmentation;
 import dev.multidownloads.progress.DownloadListener;
 
+/**
+ * A class to download a file via FTP protocol if the server supports the REST command
+ * The file is split into multiple parts and they can be retrieved concurrently.
+ * This class only download 1 part of the file.
+ * The class implements the Callable interface so it can be executed in a thread and return result after finish
+ * @see Downloader
+ * @author vanvu
+ *
+ */
 public class FTPMultiPartsDownloader extends Downloader implements Callable<Segmentation> {
 	final static Logger logger = LogManager.getLogger(FTPMultiPartsDownloader.class);
 	private static final int TIMEOUT = 30000;
@@ -24,7 +33,10 @@ public class FTPMultiPartsDownloader extends Downloader implements Callable<Segm
 	public FTPMultiPartsDownloader(DownloadInfor infor, Segmentation seg, DownloadListener progressListener) {
 		super(infor, seg, progressListener);
 	}
-
+	
+	/**
+	 * This method download a segmentation of file
+	 */
 	@Override
 	public Segmentation call() throws Exception {
 		
@@ -37,13 +49,13 @@ public class FTPMultiPartsDownloader extends Downloader implements Callable<Segm
 			try {
 				timeout = Integer.valueOf(Config.getProperty("TIMEOUT"));
 			} catch (NumberFormatException e) {
-				logger.warn("No config of FTP connection TIMEOUT. To use the default value", e.getMessage());
+				logger.warn("No config of FTP connection TIMEOUT. To use the default value {}", TIMEOUT);
 			}
 			client.setConnectTimeout(timeout);
 			
 			String urlWithoutProtocol = infor.getUrl().substring(infor.getUrl().indexOf("://") + 3);
 			client.connect(urlWithoutProtocol.substring(0, urlWithoutProtocol.indexOf("/")));
-			logger.debug("FTP connect got reply {}", client.getReplyString());
+			logger.info("FTP connect got reply {}", client.getReplyString());
 			
 			client.setSoTimeout(TIMEOUT);
 			

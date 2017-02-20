@@ -3,9 +3,21 @@ package dev.multidownloads.progress;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/**
+ * This class updates the download percentage of a file
+ * @author vanvu
+ *
+ */
 public class UpdateFileDownloadProgress implements DownloadListener {
 	final static Logger logger = LogManager.getLogger(UpdateFileDownloadProgress.class);
+	
+	/**
+	 * Total file size
+	 */
 	private int fileSize;
+	/**
+	 * Number of complete downloaded bytes so far
+	 */
 	private int totalCompleteBytes;
 	
 	public UpdateFileDownloadProgress(int fileSize) {

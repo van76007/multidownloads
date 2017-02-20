@@ -10,6 +10,11 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+/**
+ * Unit test for URLParser class
+ * @author vanvu
+ *
+ */
 public class URLParserTest extends TestCase {
 	
 	/**

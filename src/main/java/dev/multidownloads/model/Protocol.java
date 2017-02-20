@@ -1,7 +1,7 @@
 package dev.multidownloads.model;
 
 /**
- * 
+ * This is the list of current supported download protocol
  * @author vanvu
  * @ToDo: Add HTTPS, SFTP
  */

@@ -16,7 +16,8 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 /**
- * Unit test for simple App.
+ * Unit test for Downloader class
+ * Mock network input stream
  */
 public class DownloaderTest 
     extends TestCase

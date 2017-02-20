@@ -9,6 +9,11 @@ import org.apache.logging.log4j.Logger;
 import dev.multidownloads.config.Config;
 import dev.multidownloads.model.DownloadInfor;
 
+/**
+ * This class probes the HTTP server
+ * @author vanvu
+ *
+ */
 public class HTTPProber extends DownloadProber {
 	final static Logger logger = LogManager.getLogger(HTTPProber.class);
 	private static final int TIMEOUT = 30000;
@@ -20,7 +25,7 @@ public class HTTPProber extends DownloadProber {
 			try {
 				timeout = Integer.valueOf(Config.getProperty("TIMEOUT"));
 			} catch (NumberFormatException e) {
-				logger.warn("No config of HTTP connection TIMEOUT. To use the default value", e.getMessage());
+				logger.warn("No config of HTTP connection TIMEOUT. To use the default value {}", TIMEOUT);
 			}
 			conn.setConnectTimeout(timeout);
 			conn.setRequestProperty("Range", "bytes=0-1");
@@ -51,15 +56,20 @@ public class HTTPProber extends DownloadProber {
 			conn.setConnectTimeout(timeout);
 			conn.connect();
 			
-			int len = conn.getContentLength();
-			infor.setFileLength(len);
-			infor.setValid(len != -1 ? true : false);
+			// Continue only if the response code in range of 200
+			if (conn.getResponseCode() / 100 != 2) {
+				logger.error("Resource not found {}", infor.getUrl());
+				infor.setValid(false);
+			} else {
+				int len = conn.getContentLength();
+				infor.setFileLength(len);
+				infor.setValid(len != -1 ? true : false);
+			}
 			
 			conn.disconnect();
 		} catch (IOException e) {
 			infor.setValid(false);
-			logger.error("Error in detecting size of resource: ", infor.getUrl(), e);
+			logger.error("Error in detecting size of resource: {}", infor.getUrl(), e);
 		}
 	}
-
 }

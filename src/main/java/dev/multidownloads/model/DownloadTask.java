@@ -1,9 +1,22 @@
 package dev.multidownloads.model;
 import java.util.List;
 
+/**
+ * This model a download task associated with a remote file resources
+ * @author vanvu
+ *
+ */
 public class DownloadTask {
 	private DownloadStatus status = DownloadStatus.QUEUED;
+	
+	/**
+	 * List of file parts to be retrieved from the remote file resource
+	 */
 	private List<Segmentation> segmentations;
+	
+	/**
+	 * Download information associates wih the remote file resource
+	 */
 	private DownloadInfor infor;
 
 	public DownloadTask(DownloadInfor infor) {

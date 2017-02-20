@@ -15,6 +15,15 @@ import dev.multidownloads.model.DownloadStatus;
 import dev.multidownloads.model.Segmentation;
 import dev.multidownloads.progress.DownloadListener;
 
+/**
+ * A class to download a file via HTTP protocol.
+ * If the remote server understands the RANGE header, the file is split into multiple parts and they can be retrieved concurrently.
+ * If the remote server does not support the RANGE header, this class downloads the whole file.
+ * The class implements the Callable interface so it can be executed in a thread and return result after finish
+ * @see Downloader
+ * @author vanvu
+ *
+ */
 public class HTTPDownloader extends Downloader implements Callable<Segmentation> {
 	final static Logger logger = LogManager.getLogger(HTTPDownloader.class);
 	private static final int TIMEOUT = 30000;
@@ -23,6 +32,9 @@ public class HTTPDownloader extends Downloader implements Callable<Segmentation>
 		super(infor, seg, progressListener);
 	}
 	
+	/**
+	 * This method download a file by HTTP protocol
+	 */
 	@Override
 	public Segmentation call() throws Exception {
 		BufferedInputStream in = null;
@@ -35,7 +47,7 @@ public class HTTPDownloader extends Downloader implements Callable<Segmentation>
 			try {
 				timeout = Integer.valueOf(Config.getProperty("TIMEOUT"));
 			} catch (NumberFormatException e) {
-				logger.warn("No config of HTTP connection TIMEOUT. To use the default value", e.getMessage());
+				logger.warn("No config of HTTP connection TIMEOUT. To use the default value {}", TIMEOUT);
 			}
 			conn.setConnectTimeout(timeout);
 			conn.setReadTimeout(timeout);

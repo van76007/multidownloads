@@ -11,6 +11,11 @@ import org.apache.logging.log4j.Logger;
 import dev.multidownloads.config.Config;
 import dev.multidownloads.model.DownloadInfor;
 
+/**
+ * This class probes the FTP server
+ * @author vanvu
+ *
+ */
 public class FTPProber extends DownloadProber {
 	final static Logger logger = LogManager.getLogger(FTPProber.class);
 	private static final int TIMEOUT = 30000;
@@ -23,7 +28,7 @@ public class FTPProber extends DownloadProber {
 			try {
 				timeout = Integer.valueOf(Config.getProperty("TIMEOUT"));
 			} catch (NumberFormatException e) {
-				logger.warn("No config of FTP connection TIMEOUT. To use the default value", e.getMessage());
+				logger.warn("No config of FTP connection TIMEOUT. To use the default value {}", TIMEOUT);
 			}
 			conn.setConnectTimeout(timeout);
 			int len = conn.getContentLength();
@@ -44,6 +49,7 @@ public class FTPProber extends DownloadProber {
 			
 			logger.info("FTP Prober got reply: {}", client.getReplyString());
 			
+			// Detect if FTP server supports the REST command
 			infor.setSupportMultiPartsDownload(client.hasFeature("REST"));
 			client.disconnect();
 			

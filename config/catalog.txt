@@ -1,0 +1,6 @@
+ftp://mirrors.dotsrc.org/debian-cd/8.7.1/amd64/iso-cd/debian-8.7.1-amd64-CD-1.iso
+http://www.freeclassicebooks.com/Louisa%20May%20Alcott/Short%20Stories/A%20Country%20Christmas.pdf
+http://dl.my-film.org/reza/film/Coral.Reef.Adventure.2003.IMAX.720p-[My-Film].mkv
+ftp://mirrors.dotsrc.org/debian-cd/8.7.1/amd64/jigdo-bd/debian-8.7.1-amd64-BD-1.template
+http://www.freeclassicebooks.com/Agatha%20Christie/The%20Secret%20Adversary.pdf
+http://www.freeclassicebooks.com/charlotte%20bronte/Jane%20Eyre.pdf

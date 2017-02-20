@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="DEBUG">
+<Configuration status="info">
 	<Properties>
 		<Property name="log-path">C:/logs/</Property>
 	</Properties>
@@ -19,7 +19,7 @@
 		</RollingFile>
 	</Appenders>
 	<Loggers>
-		<Logger name="root" level="all" additivity="false">
+		<Logger name="root" level="info" additivity="false">
 			<appender-ref ref="RollingFile" level="info" />
 		</Logger>
 		<Root level="info" additivity="false">
