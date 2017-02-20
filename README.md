@@ -34,6 +34,8 @@ More important, we need to know the remote file size in order to:
 2. Prepare an all zero local file to be written to. In the Java implementation, we omit this steep due to the semantics of the seek operation in random access file. See Java docs.
 
 To implement the 3rd requirement, we sip the data in small buffers. See the transfer method of Downloader class. This is applicable even if we can not download a file in multi parts. We always open stream on both sides and copy data from the remote to local stream.
+Please see the heap visualization when monitoring the application by Visual VM:
+![alt text](screenshots/VisualVM.png "Heap visualization")
 
 To implement the 4th requirement, we use a simple logic: Order the remote files by size so the smaller file to be retrieved first. It could have been modified to use download speed as the sort criteria; we probe the remote resource before anyway so we may measure the download time of the sample.
 However, the important thing to note is we do not need to wait for the slowest download to finish before moving to the next. Due to the design of threadpool (in this case Java executor service), one a thread finishes its task, it can be scheduled to pick up the next item in the queue.
@@ -53,6 +55,7 @@ We need some more sophisticated framework in which a thread when fails its execu
 To implement the 6th requirement, we allows downloading the whole catalog could be retried a few times. As we view the download job is the composition of the smaller tasks, we remove the finished taskes from the collection and retain the aborted one after each run.
 As long as we can make sure that the download thread will never been in deadlock stituation, we always can delete the corrupted file eventually. 	   
 
+### Class diagram
 
 ### Installation
 
@@ -80,6 +83,7 @@ Enter full path of the catalog file (Use ./ if the catalog file is in the same f
 ```
 
 Notes:
+
 1. The application will print the log message to both console and C:\logs
 2. The config parameters should be put in a file config.properties
    The download directory string should escape the file path separator charactor
