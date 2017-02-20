@@ -13,6 +13,7 @@ import dev.multidownloads.model.DownloadInfor;
 
 /**
  * This class probes the FTP server
+ * 
  * @author vanvu
  *
  */
@@ -32,9 +33,9 @@ public class FTPProber extends DownloadProber {
 			}
 			conn.setConnectTimeout(timeout);
 			int len = conn.getContentLength();
-			
+
 			infor.setFileLength(len);
-			infor.setValid(len != -1 ? true : false);	
+			infor.setValid(len != -1 ? true : false);
 		} catch (IOException e) {
 			logger.error("Error in detecting file length of resource: ", infor.getUrl(), e);
 		}
@@ -46,13 +47,13 @@ public class FTPProber extends DownloadProber {
 			String urlWithoutProtocol = infor.getUrl().substring(infor.getUrl().indexOf("://") + 3);
 			FTPClient client = new FTPClient();
 			client.connect(urlWithoutProtocol.substring(0, urlWithoutProtocol.indexOf("/")));
-			
+
 			logger.info("FTP Prober got reply: {}", client.getReplyString());
-			
+
 			// Detect if FTP server supports the REST command
 			infor.setSupportMultiPartsDownload(client.hasFeature("REST"));
 			client.disconnect();
-			
+
 		} catch (IndexOutOfBoundsException | IOException e) {
 			logger.error("Error in detecting if support multi parts download: {}", infor.getUrl(), e);
 		}

@@ -11,21 +11,27 @@ import dev.multidownloads.model.Segmentation;
 import dev.multidownloads.progress.DownloadListener;
 
 /**
- * This class return different network downloader depending on the download protocol.
- * Any future supported protocol will require an ad-on to this class
+ * This class return different network downloader depending on the download
+ * protocol. Any future supported protocol will require an ad-on to this class
+ * 
  * @author vanvu
  *
  */
 public class DownloaderFactory {
 	/**
 	 * This method returns different types of the network downloader
-	 * @param infor Download infor to initialize the network downloader
-	 * @param seg Segmentation to initialize the network downloader
-	 * @param progressListener Listener to update download progress
+	 * 
+	 * @param infor
+	 *            Download infor to initialize the network downloader
+	 * @param seg
+	 *            Segmentation to initialize the network downloader
+	 * @param progressListener
+	 *            Listener to update download progress
 	 * @return A network downloader
 	 */
-	public static Callable<Segmentation> getDownloader(DownloadInfor infor, Segmentation seg, DownloadListener progressListener) {
-		
+	public static Callable<Segmentation> getDownloader(DownloadInfor infor, Segmentation seg,
+			DownloadListener progressListener) {
+
 		if (Protocol.HTTP == infor.getProtocol()) {
 			return new HTTPDownloader(infor, seg, progressListener);
 		}
@@ -35,7 +41,7 @@ public class DownloaderFactory {
 		if (Protocol.FTP == infor.getProtocol() && infor.isSupportMultiPartsDownload()) {
 			return new FTPMultiPartsDownloader(infor, seg, progressListener);
 		}
-		
+
 		return null;
 	}
 }

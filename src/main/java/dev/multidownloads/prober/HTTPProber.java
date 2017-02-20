@@ -1,4 +1,5 @@
 package dev.multidownloads.prober;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -11,13 +12,14 @@ import dev.multidownloads.model.DownloadInfor;
 
 /**
  * This class probes the HTTP server
+ * 
  * @author vanvu
  *
  */
 public class HTTPProber extends DownloadProber {
 	final static Logger logger = LogManager.getLogger(HTTPProber.class);
 	private static final int TIMEOUT = 30000;
-	
+
 	protected void inquiryIfSupportMultiPartsDownload(DownloadInfor infor) {
 		try {
 			HttpURLConnection conn = (HttpURLConnection) new URL(infor.getUrl()).openConnection();
@@ -30,20 +32,21 @@ public class HTTPProber extends DownloadProber {
 			conn.setConnectTimeout(timeout);
 			conn.setRequestProperty("Range", "bytes=0-1");
 			conn.connect();
-			
+
 			int len = conn.getContentLength();
 			infor.setFileLength(len);
 			infor.setValid(len != -1 ? true : false);
 			String range = conn.getHeaderField("Content-Range");
 			infor.setSupportMultiPartsDownload(range != null ? true : false);
-			
+
 			conn.disconnect();
 		} catch (IOException e) {
 			infor.setValid(false);
-			logger.error("Error in detecting if server support multi-part download of of resource: {}", infor.getUrl(), e);
+			logger.error("Error in detecting if server support multi-part download of of resource: {}", infor.getUrl(),
+					e);
 		}
 	}
-	
+
 	protected void inquiryFileLength(DownloadInfor infor) {
 		try {
 			HttpURLConnection conn = (HttpURLConnection) new URL(infor.getUrl()).openConnection();
@@ -55,7 +58,7 @@ public class HTTPProber extends DownloadProber {
 			}
 			conn.setConnectTimeout(timeout);
 			conn.connect();
-			
+
 			// Continue only if the response code in range of 200
 			if (conn.getResponseCode() / 100 != 2) {
 				logger.error("Resource not found {}", infor.getUrl());
@@ -65,7 +68,7 @@ public class HTTPProber extends DownloadProber {
 				infor.setFileLength(len);
 				infor.setValid(len != -1 ? true : false);
 			}
-			
+
 			conn.disconnect();
 		} catch (IOException e) {
 			infor.setValid(false);

@@ -5,12 +5,13 @@ import org.apache.logging.log4j.Logger;
 
 /**
  * This class updates the download percentage of a file
+ * 
  * @author vanvu
  *
  */
 public class UpdateFileDownloadProgress implements DownloadListener {
 	final static Logger logger = LogManager.getLogger(UpdateFileDownloadProgress.class);
-	
+
 	/**
 	 * Total file size
 	 */
@@ -19,11 +20,11 @@ public class UpdateFileDownloadProgress implements DownloadListener {
 	 * Number of complete downloaded bytes so far
 	 */
 	private int totalCompleteBytes;
-	
+
 	public UpdateFileDownloadProgress(int fileSize) {
 		this.fileSize = fileSize;
 	}
-	
+
 	public int getTotalCompleteBytes() {
 		return totalCompleteBytes;
 	}
@@ -35,6 +36,7 @@ public class UpdateFileDownloadProgress implements DownloadListener {
 	@Override
 	public synchronized void onUpdate(int completeBytes, String fileName) {
 		totalCompleteBytes += completeBytes;
-		logger.info(String.format("Complete download %d bytes / total %d bytes of file %s\n", totalCompleteBytes,  this.fileSize, fileName));
+		logger.info(String.format("Complete download %d bytes / total %d bytes of file %s\n", totalCompleteBytes,
+				this.fileSize, fileName));
 	}
 }

@@ -3,7 +3,9 @@ package dev.multidownloads.prober;
 import dev.multidownloads.model.DownloadInfor;
 
 /**
- * This interface will be implemented by any prober to populate a download information by the information about remote server
+ * This interface will be implemented by any prober to populate a download
+ * information by the information about remote server
+ * 
  * @author vanvu
  *
  */

@@ -12,15 +12,18 @@ import org.apache.logging.log4j.Logger;
 
 /**
  * This class read a catalog file and build list of URLs
+ * 
  * @author vanvu
  *
  */
 public class CatalogReader {
 	final static Logger logger = LogManager.getLogger(CatalogReader.class);
-	
+
 	/**
 	 * This method parses a text file line by line
-	 * @param fileName Catalog file name
+	 * 
+	 * @param fileName
+	 *            Catalog file name
 	 * @return Collection of lines in this catalog file
 	 */
 	public List<String> readDownloadCatalog(String fileName) {

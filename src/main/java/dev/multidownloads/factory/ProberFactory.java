@@ -6,15 +6,18 @@ import dev.multidownloads.prober.HTTPProber;
 import dev.multidownloads.prober.Prober;
 
 /**
- * This class return different network prober depending on the download protocol.
- * Any future supported protocol will require an ad-on to this class
+ * This class return different network prober depending on the download
+ * protocol. Any future supported protocol will require an ad-on to this class
+ * 
  * @author vanvu
  *
  */
 public class ProberFactory {
 	/**
 	 * This method initialize different types of network prober
-	 * @param proto The current supported download protocol
+	 * 
+	 * @param proto
+	 *            The current supported download protocol
 	 * @return A network prober
 	 */
 	public static Prober getProbe(Protocol proto) {
