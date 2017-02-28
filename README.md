@@ -13,8 +13,8 @@ Download in parallel multi files by splitting each file in multiple parts. Suppo
 ### Design decisions
 
 To implement the 1st requirement, we use a queue of tasks in which a fixed number of threads in a pool can process in parallel a batch of items. This pattern can be used to implement both functionalities:
-1. A catalog file is a collection of URLs which can be downloaded in parallel.
-2. A file can be viewed as an array of chunk which can be retrieved concurrently.
+* A catalog file is a collection of URLs which can be downloaded in parallel.
+* A file can be viewed as an array of chunk which can be retrieved concurrently.
 
 Note that point 2 depends on the support of remote server. For the HTTP server, it is the support of RANGE header. For the FTP server, it is the provision of the REST command.
 In both protocols we need support that can seek to an arbitrary point in the remote file stream to start download a certain number of file.
@@ -24,14 +24,14 @@ See classes DownloadManager.java and DownloadWorker.java; they apply the same th
 Although we can write less code, we prefer to have a fine-grained of models
 
 To implement the 2nd requirement, we use a factory pattern. A factory class(DownloaderFactory.java) will initialize different downloader object depending on the given protocol. If we need to support a new protocol, 3 things need to be done:
-1. Extend enum Protocol
-2. Extend the switch ... case in DownloaderFactory
-3. Implement a downloader that should extend the Downloader class and implement the Callable interface. Any extra download parameters, e.g. certificate file for HTTPS should be populated in Download infor.
+* Extend enum Protocol
+* Extend the switch ... case in DownloaderFactory
+* Implement a downloader that should extend the Downloader class and implement the Callable interface. Any extra download parameters, e.g. certificate file for HTTPS should be populated in Download infor.
 
 We also need to implement the same modifications for XXXProber classes. We needs those probers because before downloading we need to detect if the remote server supports multi-part download.
 More important, we need to know the remote file size in order to:
-1. Determine the number of chunks and range of each chunk to be retrieve from the file
-2. Prepare an all zero local file to be written to. In the Java implementation, we omit this steep due to the semantics of the seek operation in random access file. See Java docs.
+* Determine the number of chunks and range of each chunk to be retrieve from the file
+* Prepare an all zero local file to be written to. In the Java implementation, we omit this steep due to the semantics of the seek operation in random access file. See Java docs.
 
 To implement the 3rd requirement, we sip the data in small buffers. See the transfer method of Downloader class. This is applicable even if we can not download a file in multi parts. We always open stream on both sides and copy data from the remote to local stream.
 Please see the heap visualization when monitoring the application by Visual VM:
@@ -43,9 +43,9 @@ However, the important thing to note is we do not need to wait for the slowest d
 Please note that in the global scope, we still have to wait for all tasks to finish to know if the download of all URLs is completed successfully.
 
 To implement the 5th requirement, we have to make sure that threads serving task will never be in the deadlock state. To do so in the implementation, we make sure:
-1. Set time out parameter for the network activities so the thread will not wait forever, e.g. to response to server's login challenge.
-2. Catch all exceptions and handler them
-3. Make sure there would be no deadlock situation for the shared resource. In the current implementation, there are 2 kinds of the share resources:
+* Set time out parameter for the network activities so the thread will not wait forever, e.g. to response to server's login challenge.
+* Catch all exceptions and handler them
+* Make sure there would be no deadlock situation for the shared resource. In the current implementation, there are 2 kinds of the share resources:
     a. Update progress listener: Access to the common function to print out the progress is synchronized
 	b. Multiple download sockets can write to the same local file: However, their destinations are not overlapped and we rely on the OS to synchronize access to the file. If the OS does not support concurrent write to file, we could have implemented Producer-Consumer pattern.
 	   Writers (sockets) write to a circular buffer queues while 1 reader read from the queue and write to file. Be careful to select the size of the buffer. It should be fit in the memory, meanwhile we need to synchronize the read/write speed to avoid overflow buffer.
