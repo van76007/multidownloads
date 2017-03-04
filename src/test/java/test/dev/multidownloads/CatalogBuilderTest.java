@@ -1,4 +1,4 @@
-package dev.multidownloads.test;
+package test.dev.multidownloads;
 
 import java.util.Arrays;
 import java.util.List;

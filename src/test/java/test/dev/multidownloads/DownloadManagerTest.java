@@ -1,4 +1,4 @@
-package dev.multidownloads.test;
+package test.dev.multidownloads;
 
 import java.io.File;
 import java.io.FileInputStream;

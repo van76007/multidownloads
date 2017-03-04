@@ -1,4 +1,4 @@
-package dev.multidownloads.downloader.test;
+package test.dev.multidownloads.downloader;
 
 import dev.multidownloads.downloader.Downloader;
 import dev.multidownloads.model.DownloadInfor;

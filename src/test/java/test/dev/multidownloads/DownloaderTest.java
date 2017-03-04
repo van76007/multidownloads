@@ -1,4 +1,4 @@
-package dev.multidownloads.test;
+package test.dev.multidownloads;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -8,13 +8,13 @@ import java.io.RandomAccessFile;
 import java.util.concurrent.ThreadLocalRandom;
 
 import dev.multidownloads.downloader.Downloader;
-import dev.multidownloads.downloader.test.MockDownloader;
 import dev.multidownloads.model.DownloadInfor;
 import dev.multidownloads.model.Segmentation;
-import dev.multidownloads.progress.test.MockUpdateFileDownloadProgress;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import test.dev.multidownloads.downloader.MockDownloader;
+import test.dev.multidownloads.progress.MockUpdateFileDownloadProgress;
 
 /**
  * Unit test for Downloader class Mock network input stream
