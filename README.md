@@ -95,6 +95,7 @@ Prerequisitions:
 4. Maven
 
 Compilation:
+
 Output file is multidownloads-0.0.2-SNAPSHOT.jar (The version number can be changed in the pom.xml)
 ```
     mvn clean install -DskipTests
@@ -106,6 +107,7 @@ Test:
 ```
 
 Run the application:
+
 Create a catalog.txt file and put it in the same directory with the Jar file (not a mandatory):
 ```
 java -cp multidownloads-0.0.2-SNAPSHOT.jar dev.multidownloads.MainApp
