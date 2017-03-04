@@ -95,19 +95,22 @@ Prerequisitions:
 4. Maven
 
 Compilation:
+Output file is multidownloads-0.0.2-SNAPSHOT.jar (The version number can be changed in the pom.xml)
 ```
     mvn clean install -DskipTests
 ```
 
 Test:
 ```
-    mvn clean test
+    mvn clean install test
 ```
 
 Run the application:
+Create a catalog.txt file and put it in the same directory with the Jar file (not a mandatory):
 ```
-java -cp multidownloads-0.0.1-SNAPSHOT.jar dev.multidownloads.MainApp
+java -cp multidownloads-0.0.2-SNAPSHOT.jar dev.multidownloads.MainApp
 Enter full path of the catalog file (Use ./ if the catalog file is in the same folder with the JAR file):
+./catalog.txt
 ```
 
 Notes:
