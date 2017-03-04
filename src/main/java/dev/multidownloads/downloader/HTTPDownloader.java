@@ -15,6 +15,7 @@ import dev.multidownloads.model.DownloadInfor;
 import dev.multidownloads.model.DownloadStatus;
 import dev.multidownloads.model.Segmentation;
 import dev.multidownloads.progress.DownloadListener;
+import dev.multidownloads.progress.SpeedInformer;
 
 /**
  * A class to download a file via HTTP protocol. If the remote server
@@ -31,8 +32,8 @@ import dev.multidownloads.progress.DownloadListener;
 public class HTTPDownloader extends Downloader implements Callable<Segmentation> {
 	final static Logger logger = LogManager.getLogger(HTTPDownloader.class);
 
-	public HTTPDownloader(DownloadInfor infor, Segmentation seg, DownloadListener progressListener) {
-		super(infor, seg, progressListener);
+	public HTTPDownloader(DownloadInfor infor, Segmentation seg, DownloadListener progressListener, SpeedInformer speedInformer) {
+		super(infor, seg, progressListener, speedInformer);
 	}
 
 	/**

@@ -18,6 +18,7 @@ import dev.multidownloads.model.DownloadStatus;
 import dev.multidownloads.model.DownloadTask;
 import dev.multidownloads.model.Segmentation;
 import dev.multidownloads.progress.DownloadListener;
+import dev.multidownloads.progress.SpeedInformer;
 import dev.multidownloads.progress.UpdateFileDownloadProgress;
 
 /**
@@ -68,10 +69,12 @@ public class DownloadWorker implements Callable<DownloadTask> {
 		UpdateFileDownloadProgress fileDownloadProgress = new UpdateFileDownloadProgress(
 				task.getInfor().getFileLength());
 		fileDownloadProgress.setTotalCompleteBytes(task.getInfor().getTotalCompleteBytes());
+		
+		SpeedInformer speedInformer = new SpeedInformer(task.getInfor().getFileName());
 
 		for (Segmentation seg : task.getSegmentations()) {
 			Callable<Segmentation> connector = DownloaderFactory.getDownloader(task.getInfor(), seg,
-					fileDownloadProgress);
+					fileDownloadProgress, speedInformer);
 			listOfConcurrentConnections.add(executor.submit(connector));
 		}
 

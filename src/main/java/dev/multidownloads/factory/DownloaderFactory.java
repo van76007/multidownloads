@@ -9,6 +9,7 @@ import dev.multidownloads.model.DownloadInfor;
 import dev.multidownloads.model.Protocol;
 import dev.multidownloads.model.Segmentation;
 import dev.multidownloads.progress.DownloadListener;
+import dev.multidownloads.progress.SpeedInformer;
 
 /**
  * This class return different network downloader depending on the download
@@ -30,16 +31,16 @@ public class DownloaderFactory {
 	 * @return A network downloader
 	 */
 	public static Callable<Segmentation> getDownloader(DownloadInfor infor, Segmentation seg,
-			DownloadListener progressListener) {
+			DownloadListener progressListener, SpeedInformer speedInformer) {
 
 		if (Protocol.HTTP == infor.getProtocol()) {
-			return new HTTPDownloader(infor, seg, progressListener);
+			return new HTTPDownloader(infor, seg, progressListener, speedInformer);
 		}
 		if (Protocol.FTP == infor.getProtocol() && !infor.isSupportMultiPartsDownload()) {
-			return new FTPSinglePartDownloader(infor, seg, progressListener);
+			return new FTPSinglePartDownloader(infor, seg, progressListener, speedInformer);
 		}
 		if (Protocol.FTP == infor.getProtocol() && infor.isSupportMultiPartsDownload()) {
-			return new FTPMultiPartsDownloader(infor, seg, progressListener);
+			return new FTPMultiPartsDownloader(infor, seg, progressListener, speedInformer);
 		}
 
 		return null;

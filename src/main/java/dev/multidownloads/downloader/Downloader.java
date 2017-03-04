@@ -11,6 +11,7 @@ import dev.multidownloads.config.Config;
 import dev.multidownloads.model.DownloadInfor;
 import dev.multidownloads.model.Segmentation;
 import dev.multidownloads.progress.DownloadListener;
+import dev.multidownloads.progress.SpeedInformer;
 
 /**
  * This is the base class of all connector to download a remote resource. It
@@ -23,6 +24,7 @@ public abstract class Downloader {
 	final static Logger logger = LogManager.getLogger(Downloader.class);
 	
 	DownloadListener progressListener;
+	SpeedInformer speedInformer;
 
 	/**
 	 * The segmentation to be retrieved
@@ -34,10 +36,11 @@ public abstract class Downloader {
 	 */
 	protected DownloadInfor infor;
 
-	public Downloader(DownloadInfor infor, Segmentation seg, DownloadListener progressListener) {
+	public Downloader(DownloadInfor infor, Segmentation seg, DownloadListener progressListener, SpeedInformer speedInformer) {
 		this.infor = infor;
 		this.seg = seg;
 		this.progressListener = progressListener;
+		this.speedInformer = speedInformer;
 		logger.info("To download a file {} in {}", infor.getFileName(), seg.toString());
 	}
 
@@ -58,8 +61,11 @@ public abstract class Downloader {
 		int bufSize = Config.getParameterAsInteger("BUFFER_SIZE_IN_KB")* 1024;
 		int numByteRead;
 		byte data[] = new byte[bufSize];
-
-		int remaining = seg.endByte - seg.startByte + 1;
+		
+		speedInformer.startCalculatingDownloadSpeed();
+		
+		int numberOfBytesToDownload = seg.endByte - seg.startByte + 1;
+		int remaining = numberOfBytesToDownload;
 		while (remaining > 0) {
 			int readBufSize = bufSize < remaining ? bufSize : remaining;
 			numByteRead = input.read(data, 0, readBufSize);
@@ -73,6 +79,8 @@ public abstract class Downloader {
 
 		if (remaining < 0) {
 			logger.error("Number of Remaining bytes is negative");
+		} else {
+			speedInformer.publishDownloadSpeed(numberOfBytesToDownload);
 		}
 	}
 

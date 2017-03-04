@@ -16,6 +16,7 @@ import dev.multidownloads.model.DownloadInfor;
 import dev.multidownloads.model.DownloadStatus;
 import dev.multidownloads.model.Segmentation;
 import dev.multidownloads.progress.DownloadListener;
+import dev.multidownloads.progress.SpeedInformer;
 
 /**
  * A class to download a file via FTP protocol if the server does not support
@@ -31,8 +32,8 @@ import dev.multidownloads.progress.DownloadListener;
 public class FTPSinglePartDownloader extends Downloader implements Callable<Segmentation> {
 	final static Logger logger = LogManager.getLogger(FTPSinglePartDownloader.class);
 
-	public FTPSinglePartDownloader(DownloadInfor infor, Segmentation seg, DownloadListener progressListener) {
-		super(infor, seg, progressListener);
+	public FTPSinglePartDownloader(DownloadInfor infor, Segmentation seg, DownloadListener progressListener, SpeedInformer speedInformer) {
+		super(infor, seg, progressListener, speedInformer);
 	}
 
 	/**

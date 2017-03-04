@@ -10,6 +10,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import dev.multidownloads.downloader.Downloader;
 import dev.multidownloads.model.DownloadInfor;
 import dev.multidownloads.model.Segmentation;
+import dev.multidownloads.progress.SpeedInformer;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -49,6 +50,7 @@ public class DownloaderTest extends TestCase {
 	public void testTransferOnePartAtRandomOffSet() {
 		MockUpdateFileDownloadProgress progressListener = new MockUpdateFileDownloadProgress();
 		DownloadInfor infor = new DownloadInfor();
+		SpeedInformer speedInformer = new SpeedInformer("");
 
 		int startSeg = ThreadLocalRandom.current().nextInt(0, TEST_FILE_LENGTH - SEG_SIZE);
 		Segmentation seg = new Segmentation(startSeg, startSeg + SEG_SIZE - 1);
@@ -58,7 +60,7 @@ public class DownloaderTest extends TestCase {
 			RandomAccessFile raf = buildAllZeroTestFile();
 			raf.seek(startSeg);
 
-			Downloader downloader = new MockDownloader(infor, seg, progressListener);
+			Downloader downloader = new MockDownloader(infor, seg, progressListener, speedInformer);
 			downloader.transfer(input, raf, seg);
 
 			int numberOfWrittenFile = returnNumberOfWrittenBytes(raf, startSeg);

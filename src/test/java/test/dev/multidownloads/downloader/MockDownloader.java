@@ -4,11 +4,12 @@ import dev.multidownloads.downloader.Downloader;
 import dev.multidownloads.model.DownloadInfor;
 import dev.multidownloads.model.Segmentation;
 import dev.multidownloads.progress.DownloadListener;
+import dev.multidownloads.progress.SpeedInformer;
 
 public class MockDownloader extends Downloader {
 
-	public MockDownloader(DownloadInfor infor, Segmentation seg, DownloadListener progressListener) {
-		super(infor, seg, progressListener);
+	public MockDownloader(DownloadInfor infor, Segmentation seg, DownloadListener progressListener, SpeedInformer speedInformer) {
+		super(infor, seg, progressListener, speedInformer);
 	}
 
 	@Override

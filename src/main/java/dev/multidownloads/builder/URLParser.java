@@ -1,5 +1,9 @@
 package dev.multidownloads.builder;
 
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
@@ -19,6 +23,9 @@ import dev.multidownloads.model.Protocol;
  */
 public class URLParser {
 	final static Logger logger = LogManager.getLogger(URLParser.class);
+	
+	private static final String PROTOCOL_SEPERATOR = "://";
+	private static final char SLASH = '/';
 
 	/**
 	 * This method populate a download information with URL, username/password
@@ -35,6 +42,7 @@ public class URLParser {
 		if (tokens.length > 0) {
 			infor.setUrl(tokens[0]);
 		}
+		
 		if (tokens.length > 1) {
 			infor.setUserName(tokens[1]);
 		}
@@ -104,7 +112,7 @@ public class URLParser {
 	private Protocol getProtocol(String url) {
 		String proto = null;
 		try {
-			proto = url.substring(0, url.indexOf("://"));
+			proto = url.substring(0, url.indexOf(PROTOCOL_SEPERATOR));
 		} catch (IndexOutOfBoundsException e) {
 			logger.error("Impossible to determine download protocol", e);
 		}
@@ -119,6 +127,27 @@ public class URLParser {
 	 * @throws IndexOutOfBoundsException
 	 */
 	private String getFileName(String url) throws IndexOutOfBoundsException {
-		return url.substring(url.lastIndexOf('/') + 1, url.length());
+		return url.substring(url.lastIndexOf(SLASH) + 1, url.length());
+	}
+	
+	/**
+	 * This method convert the catalog line to URI syntax
+	 * Example:
+	 * http://www.freeclassicebooks.com/charlotte 20bronte/Jane Eyre.pdf
+	 * ->
+	 * http://www.freeclassicebooks.com/charlotte%20bronte/Jane%20Eyre.pdf
+	 * @param infor Download Infor
+	 * @return true if the catalog line is valid according to URL&URI syntax
+	 */
+	public boolean encodeURI(DownloadInfor infor) {
+		try {
+			URL url = new URL(infor.getUrl());
+			URI uri = new URI(url.getProtocol(), url.getHost(), url.getPath(), null);
+			infor.setUrl(uri.toString());
+		} catch (URISyntaxException| MalformedURLException e) {
+			logger.error("Mal-formed URL {}", infor.getUrl());
+			infor.setValid(false);
+		}
+		return infor.isValid();
 	}
 }

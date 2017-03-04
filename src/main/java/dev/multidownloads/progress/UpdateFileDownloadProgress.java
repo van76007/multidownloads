@@ -20,9 +20,12 @@ public class UpdateFileDownloadProgress implements DownloadListener {
 	 * Number of complete downloaded bytes so far
 	 */
 	private int totalCompleteBytes;
+	
+	
 
 	public UpdateFileDownloadProgress(int fileSize) {
 		this.fileSize = fileSize;
+		
 	}
 
 	public int getTotalCompleteBytes() {
@@ -32,7 +35,8 @@ public class UpdateFileDownloadProgress implements DownloadListener {
 	public void setTotalCompleteBytes(int totalCompleteBytes) {
 		this.totalCompleteBytes = totalCompleteBytes;
 	}
-
+	
+	
 	@Override
 	public synchronized void onUpdate(int completeBytes, String fileName) {
 		totalCompleteBytes += completeBytes;

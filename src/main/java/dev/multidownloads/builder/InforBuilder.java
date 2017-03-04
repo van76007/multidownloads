@@ -57,6 +57,7 @@ public class InforBuilder {
 
 		DownloadInfor infor = new DownloadInfor();
 		infor.setDownloadDirectory(downloadDirectory);
+		
 		parser.setUrlAndDownloadCredentials(infor, catalogLine);
 
 		if (!parser.setAndValidateProtocol(infor)) {
@@ -66,7 +67,11 @@ public class InforBuilder {
 		if (!parser.setAndValidateFileName(infor)) {
 			return infor;
 		}
-
+		
+		if (!parser.encodeURI(infor)) {
+			return infor;
+		}
+		
 		setFileSizeAndMultiPartsDownloadSupport(infor);
 		return infor;
 	}
