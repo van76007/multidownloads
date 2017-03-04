@@ -29,9 +29,7 @@ import dev.multidownloads.progress.DownloadListener;
  */
 public class FTPMultiPartsDownloader extends Downloader implements Callable<Segmentation> {
 	final static Logger logger = LogManager.getLogger(FTPMultiPartsDownloader.class);
-	private static final int TIMEOUT = 30000;
-	private static final String DEFAULT_CREDENTIAL = "anonymous";
-
+	
 	public FTPMultiPartsDownloader(DownloadInfor infor, Segmentation seg, DownloadListener progressListener) {
 		super(infor, seg, progressListener);
 	}
@@ -47,22 +45,17 @@ public class FTPMultiPartsDownloader extends Downloader implements Callable<Segm
 		FTPClient client = new FTPClient();
 
 		try {
-			int timeout = TIMEOUT;
-			try {
-				timeout = Integer.valueOf(Config.getProperty("TIMEOUT"));
-			} catch (NumberFormatException e) {
-				logger.warn("No config of FTP connection TIMEOUT. To use the default value {}", TIMEOUT);
-			}
+			int timeout = Config.getParameterAsInteger("NETWORK_TIMEOUT_IN_MILLISECONDS");
 			client.setConnectTimeout(timeout);
 
 			String urlWithoutProtocol = infor.getUrl().substring(infor.getUrl().indexOf("://") + 3);
 			client.connect(urlWithoutProtocol.substring(0, urlWithoutProtocol.indexOf("/")));
 			logger.info("FTP connect got reply {}", client.getReplyString());
 
-			client.setSoTimeout(TIMEOUT);
+			client.setSoTimeout(timeout);
 
 			if (infor.getUserName() == null && infor.getPassword() == null) {
-				client.login(DEFAULT_CREDENTIAL, DEFAULT_CREDENTIAL);
+				client.login(Config.getParameterAsString("DEFAULT_FTP_CREDENTIAL"), Config.getParameterAsString("DEFAULT_FTP_CREDENTIAL"));
 			} else {
 				client.login(infor.getUserName(), infor.getPassword());
 			}
@@ -106,21 +99,18 @@ public class FTPMultiPartsDownloader extends Downloader implements Callable<Segm
 			if (in != null) {
 				try {
 					in.close();
-				} catch (IOException e) {
-				}
+				} catch (IOException e) {}
 			}
 
 			try {
 				client.completePendingCommand();
-			} catch (IOException e) {
-			}
+			} catch (IOException e) {}
 
 			if (client.isConnected()) {
 				try {
 					client.logout();
 					client.disconnect();
-				} catch (IOException e) {
-				}
+				} catch (IOException e) {}
 			}
 		}
 
@@ -132,5 +122,4 @@ public class FTPMultiPartsDownloader extends Downloader implements Callable<Segm
 	public void setError(Segmentation seg) {
 		seg.setStatus(DownloadStatus.ABORTED);
 	}
-
 }

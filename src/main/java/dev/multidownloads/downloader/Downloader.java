@@ -19,9 +19,9 @@ import dev.multidownloads.progress.DownloadListener;
  * @author vanvu
  *
  */
-public class Downloader {
+public abstract class Downloader {
 	final static Logger logger = LogManager.getLogger(Downloader.class);
-	private static final int BUFFER_SIZE = 2048;
+	
 	DownloadListener progressListener;
 
 	/**
@@ -55,13 +55,7 @@ public class Downloader {
 	 * @throws IOException
 	 */
 	public void transfer(InputStream input, RandomAccessFile raf, Segmentation seg) throws IOException {
-		int bufSize = BUFFER_SIZE;
-		try {
-			bufSize = Integer.valueOf(Config.getProperty("BUFFER_SIZE"));
-		} catch (NumberFormatException e) {
-			logger.warn("No config of BUFFER_SIZE. To use the default value {}", BUFFER_SIZE);
-		}
-
+		int bufSize = Config.getParameterAsInteger("BUFFER_SIZE_IN_KB")* 1024;
 		int numByteRead;
 		byte data[] = new byte[bufSize];
 
@@ -87,6 +81,5 @@ public class Downloader {
 	 * 
 	 * @param seg
 	 */
-	protected void setError(Segmentation seg) {
-	}
+	abstract protected void setError(Segmentation seg);
 }

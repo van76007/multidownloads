@@ -34,12 +34,6 @@ import dev.multidownloads.progress.UpdateBatchDownloadProgress;
  */
 public class DownloadManager {
 	final static Logger logger = LogManager.getLogger(DownloadManager.class);
-	private static final int NUM_OF_PARALLEL_DOWNLOAD = 2;
-	private static final int MAX_NUM_OF_RETRY = 2;
-	private static final int DELAY = 1000 * 60; // 1 min between retry download
-												// pass
-	private static final int TIMEOUT_IN_SECONDS = 30;
-
 	CatalogBuilder catalogBuilder = new CatalogBuilder();
 
 	public CatalogBuilder getCatalogBuilder() {
@@ -91,15 +85,8 @@ public class DownloadManager {
 	 */
 	private boolean downloadWithRetry(List<DownloadTask> tasks) {
 		boolean downloadResult = false;
-		int maxRetry = MAX_NUM_OF_RETRY;
-		int delay = DELAY;
-		try {
-			maxRetry = Integer.valueOf(Config.getProperty("MAX_NUM_OF_RETRY"));
-			delay = Integer.valueOf(Config.getProperty("DELAY"));
-		} catch (NumberFormatException e) {
-			logger.warn("No config of DELAY or RETRY. To use the default value MAX_NUM_OF_RETRY = {} and DELAY = {}s",
-					MAX_NUM_OF_RETRY, DELAY);
-		}
+		int maxRetry = Config.getParameterAsInteger("MAX_NUM_OF_RETRY");
+		int delay = Config.getParameterAsInteger("DELAY_IN_SECONDS")*1000;
 
 		int retry = 0;
 		int numberOfCompleteFiles = 0;
@@ -143,13 +130,8 @@ public class DownloadManager {
 	 */
 	private int downloadOnePass(List<DownloadTask> tasks, int numberOfCompleteFiles) {
 		logger.info("Start one download pass");
-		int numberOfParallelDownload = NUM_OF_PARALLEL_DOWNLOAD;
-		try {
-			numberOfParallelDownload = Integer.valueOf(Config.getProperty("NUM_OF_PARALLEL_DOWNLOAD"));
-		} catch (NumberFormatException e) {
-			logger.warn("No config of NUM_OF_PARALLEL_DOWNLOAD. To use the default value {}", NUM_OF_PARALLEL_DOWNLOAD);
-		}
-
+		int numberOfParallelDownload = Config.getParameterAsInteger("NUM_OF_PARALLEL_DOWNLOAD");
+		
 		ExecutorService executor = Executors.newFixedThreadPool(numberOfParallelDownload);
 		List<Future<DownloadTask>> listOfDownloadTasks = new ArrayList<Future<DownloadTask>>();
 
@@ -174,7 +156,7 @@ public class DownloadManager {
 
 		executor.shutdown();
 		try {
-			executor.awaitTermination(TIMEOUT_IN_SECONDS, TimeUnit.SECONDS);
+			executor.awaitTermination(Config.getParameterAsInteger("TIMEOUT_IN_SECONDS"), TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
 			logger.error("Download error", e);
 		}

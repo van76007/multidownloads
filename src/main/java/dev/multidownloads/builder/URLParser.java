@@ -19,7 +19,6 @@ import dev.multidownloads.model.Protocol;
  */
 public class URLParser {
 	final static Logger logger = LogManager.getLogger(URLParser.class);
-	private static String SEPARATOR = ";";
 
 	/**
 	 * This method populate a download information with URL, username/password
@@ -86,7 +85,7 @@ public class URLParser {
 	 * @return Tuplet (URL, username, password)
 	 */
 	private String[] getUrlAndCredentials(String catalogLine) {
-		String separator = Config.getProperty("SEPARATOR") != null ? Config.getProperty("SEPARATOR") : SEPARATOR;
+		String separator = Config.getParameterAsString("SEPARATOR");
 		StringTokenizer st = new StringTokenizer(catalogLine, separator);
 		ArrayList<String> arr = new ArrayList<String>(catalogLine.length());
 		while (st.hasMoreTokens()) {

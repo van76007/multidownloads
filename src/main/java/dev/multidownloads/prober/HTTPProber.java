@@ -18,17 +18,11 @@ import dev.multidownloads.model.DownloadInfor;
  */
 public class HTTPProber extends DownloadProber {
 	final static Logger logger = LogManager.getLogger(HTTPProber.class);
-	private static final int TIMEOUT = 30000;
 
 	protected void inquiryIfSupportMultiPartsDownload(DownloadInfor infor) {
 		try {
 			HttpURLConnection conn = (HttpURLConnection) new URL(infor.getUrl()).openConnection();
-			int timeout = TIMEOUT;
-			try {
-				timeout = Integer.valueOf(Config.getProperty("TIMEOUT"));
-			} catch (NumberFormatException e) {
-				logger.warn("No config of HTTP connection TIMEOUT. To use the default value {}", TIMEOUT);
-			}
+			int timeout = Config.getParameterAsInteger("NETWORK_TIMEOUT_IN_MILLISECONDS");
 			conn.setConnectTimeout(timeout);
 			conn.setRequestProperty("Range", "bytes=0-1");
 			conn.connect();
@@ -50,12 +44,7 @@ public class HTTPProber extends DownloadProber {
 	protected void inquiryFileLength(DownloadInfor infor) {
 		try {
 			HttpURLConnection conn = (HttpURLConnection) new URL(infor.getUrl()).openConnection();
-			int timeout = TIMEOUT;
-			try {
-				timeout = Integer.valueOf(Config.getProperty("TIMEOUT"));
-			} catch (NumberFormatException e) {
-				logger.warn("No config of HTTP connection TIMEOUT. To use the default value", e.getMessage());
-			}
+			int timeout = Config.getParameterAsInteger("NETWORK_TIMEOUT_IN_MILLISECONDS");
 			conn.setConnectTimeout(timeout);
 			conn.connect();
 

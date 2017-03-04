@@ -19,18 +19,12 @@ import dev.multidownloads.model.DownloadInfor;
  */
 public class FTPProber extends DownloadProber {
 	final static Logger logger = LogManager.getLogger(FTPProber.class);
-	private static final int TIMEOUT = 30000;
-
+	
 	@Override
 	protected void inquiryFileLength(DownloadInfor infor) {
 		try {
 			URLConnection conn = new URL(infor.getUrl()).openConnection();
-			int timeout = TIMEOUT;
-			try {
-				timeout = Integer.valueOf(Config.getProperty("TIMEOUT"));
-			} catch (NumberFormatException e) {
-				logger.warn("No config of FTP connection TIMEOUT. To use the default value {}", TIMEOUT);
-			}
+			int timeout = Config.getParameterAsInteger("NETWORK_TIMEOUT_IN_MILLISECONDS");
 			conn.setConnectTimeout(timeout);
 			int len = conn.getContentLength();
 

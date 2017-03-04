@@ -30,7 +30,6 @@ import dev.multidownloads.progress.DownloadListener;
  */
 public class FTPSinglePartDownloader extends Downloader implements Callable<Segmentation> {
 	final static Logger logger = LogManager.getLogger(FTPSinglePartDownloader.class);
-	private static final int TIMEOUT = 30000;
 
 	public FTPSinglePartDownloader(DownloadInfor infor, Segmentation seg, DownloadListener progressListener) {
 		super(infor, seg, progressListener);
@@ -46,12 +45,7 @@ public class FTPSinglePartDownloader extends Downloader implements Callable<Segm
 
 		try {
 			URLConnection conn = new URL(infor.getUrl()).openConnection();
-			int timeout = TIMEOUT;
-			try {
-				timeout = Integer.valueOf(Config.getProperty("TIMEOUT"));
-			} catch (NumberFormatException e) {
-				logger.warn("No config of FTP connection TIMEOUT. To use the default value {}", TIMEOUT);
-			}
+			int timeout = Config.getParameterAsInteger("NETWORK_TIMEOUT_IN_MILLISECONDS");
 			conn.setReadTimeout(timeout);
 			conn.setConnectTimeout(timeout);
 
@@ -75,15 +69,13 @@ public class FTPSinglePartDownloader extends Downloader implements Callable<Segm
 			if (raf != null) {
 				try {
 					raf.close();
-				} catch (IOException e) {
-				}
+				} catch (IOException e) {}
 			}
 
 			if (in != null) {
 				try {
 					in.close();
-				} catch (IOException e) {
-				}
+				} catch (IOException e) {}
 			}
 		}
 
@@ -95,5 +87,4 @@ public class FTPSinglePartDownloader extends Downloader implements Callable<Segm
 	public void setError(Segmentation seg) {
 		seg.setStatus(DownloadStatus.ABORTED);
 	}
-
 }

@@ -32,8 +32,6 @@ import dev.multidownloads.progress.UpdateFileDownloadProgress;
  */
 public class DownloadWorker implements Callable<DownloadTask> {
 	final static Logger logger = LogManager.getLogger(DownloadWorker.class);
-	private static final int NUM_OF_CONCURRENT_CONNECTION = 5;
-	private static final int TIMEOUT_IN_SECONDS = 30;
 
 	DownloadTask task;
 	DownloadListener progressListener;
@@ -61,13 +59,7 @@ public class DownloadWorker implements Callable<DownloadTask> {
 	public DownloadTask call() throws Exception {
 		int numOfConcurrentConnections = 1;
 		if (task.getInfor().isSupportMultiPartsDownload()) {
-			try {
-				numOfConcurrentConnections = Integer.valueOf(Config.getProperty("NUM_OF_CONCURRENT_CONNECTION"));
-			} catch (NumberFormatException e) {
-				numOfConcurrentConnections = NUM_OF_CONCURRENT_CONNECTION;
-				logger.warn("No config of NUM_OF_CONCURRENT_CONNECTION. To use the default value {}",
-						NUM_OF_CONCURRENT_CONNECTION);
-			}
+			numOfConcurrentConnections = Config.getParameterAsInteger("NUM_OF_CONCURRENT_CONNECTION");
 		}
 
 		ExecutorService executor = Executors.newFixedThreadPool(numOfConcurrentConnections);
@@ -104,7 +96,7 @@ public class DownloadWorker implements Callable<DownloadTask> {
 
 		executor.shutdown();
 		try {
-			executor.awaitTermination(TIMEOUT_IN_SECONDS, TimeUnit.SECONDS);
+			executor.awaitTermination(Config.getParameterAsInteger("TIMEOUT_IN_SECONDS"), TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
 			logger.error("Error in terminating download one file", e);
 		}

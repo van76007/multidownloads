@@ -25,12 +25,7 @@ import dev.multidownloads.model.Segmentation;
  */
 public class CatalogBuilder {
 	final static Logger logger = LogManager.getLogger(CatalogBuilder.class);
-	private static final int SEGMENTATION_SIZE = 1048576; // 1048576 if want to
-															// split file into
-															// chunk of 1MB
-															// each. Or 262144 =
-															// 256kB
-
+	
 	/**
 	 * A builder to build download information associated with each download
 	 * task
@@ -59,12 +54,7 @@ public class CatalogBuilder {
 	 *            Catalog file name
 	 */
 	public void buildCatalog(DownloadCatalog catalog, String catalogFileName) {
-		int segmentationSize = SEGMENTATION_SIZE;
-		try {
-			segmentationSize = Integer.valueOf(Config.getProperty("SEGMENTATION_SIZE"));
-		} catch (NumberFormatException e) {
-			logger.warn("No config of SEGMENTATION_SIZE. To use the default value {}", SEGMENTATION_SIZE);
-		}
+		int segmentationSize = Config.getParameterAsInteger("SEGMENTATION_SIZE_IN_KB") * 1024;
 
 		String downloadDiretory = getDownloadDirectory();
 		catalog.setValid(downloadDiretory != null);
@@ -84,11 +74,7 @@ public class CatalogBuilder {
 	 * @return Path of the download directory
 	 */
 	public String getDownloadDirectory() {
-		StringBuilder sb = new StringBuilder(System.getProperty("user.home")).append(File.separator).append("DL")
-				.append(File.separator);
-		String defaultDownloadDirectory = sb.toString();
-		String downloadDir = (Config.getProperty("DOWNLOAD_DIR") == null ? defaultDownloadDirectory
-				: Config.getProperty("DOWNLOAD_DIR"));
+		String downloadDir = Config.getParameterAsString("DOWNLOAD_DIR");
 		logger.info("Read DOWNLOAD_DIR is {}", downloadDir);
 
 		File directory = new File(downloadDir);

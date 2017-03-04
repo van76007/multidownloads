@@ -30,7 +30,6 @@ import dev.multidownloads.progress.DownloadListener;
  */
 public class HTTPDownloader extends Downloader implements Callable<Segmentation> {
 	final static Logger logger = LogManager.getLogger(HTTPDownloader.class);
-	private static final int TIMEOUT = 30000;
 
 	public HTTPDownloader(DownloadInfor infor, Segmentation seg, DownloadListener progressListener) {
 		super(infor, seg, progressListener);
@@ -47,12 +46,7 @@ public class HTTPDownloader extends Downloader implements Callable<Segmentation>
 		HttpURLConnection conn = null;
 		try {
 			conn = (HttpURLConnection) new URL(infor.getUrl()).openConnection();
-			int timeout = TIMEOUT;
-			try {
-				timeout = Integer.valueOf(Config.getProperty("TIMEOUT"));
-			} catch (NumberFormatException e) {
-				logger.warn("No config of HTTP connection TIMEOUT. To use the default value {}", TIMEOUT);
-			}
+			int timeout = Config.getParameterAsInteger("NETWORK_TIMEOUT_IN_MILLISECONDS");
 			conn.setConnectTimeout(timeout);
 			conn.setReadTimeout(timeout);
 
@@ -80,8 +74,7 @@ public class HTTPDownloader extends Downloader implements Callable<Segmentation>
 			if (infor.isSupportMultiPartsDownload()) {
 				raf.seek(seg.startByte);
 			} else {
-				// If single download, always download from the beginning of
-				// file
+				// If single download, always download from the beginning of file
 				raf.seek(0);
 			}
 
@@ -96,15 +89,13 @@ public class HTTPDownloader extends Downloader implements Callable<Segmentation>
 			if (raf != null) {
 				try {
 					raf.close();
-				} catch (IOException e) {
-				}
+				} catch (IOException e) {}
 			}
 
 			if (in != null) {
 				try {
 					in.close();
-				} catch (IOException e) {
-				}
+				} catch (IOException e) {}
 			}
 
 			conn.disconnect();
